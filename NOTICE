@@ -20,6 +20,7 @@ list (author, source, license) is in ATTRIBUTION.md.
 - Inter typeface (assets/fonts/Inter-*.ttf) — SIL Open Font License 1.1. See assets/fonts/OFL-Inter.txt.
 - JetBrains Mono typeface (assets/fonts/JetBrainsMono-*.ttf) — SIL Open Font License 1.1. See assets/fonts/OFL-JetBrainsMono.txt.
 - Dancing Script typeface (assets/fonts/DancingScript.ttf), Copyright 2016 The Dancing Script Project Authors — SIL Open Font License 1.1 (Reserved Font Name "Dancing Script"). See assets/fonts/OFL-DancingScript.txt.
+- Noto Sans Khmer and Noto Serif Khmer typefaces (assets/fonts/NotoSansKhmer-*.ttf, assets/fonts/NotoSerifKhmer-*.ttf), Copyright 2022 The Noto Project Authors (https://github.com/notofonts/khmer) — SIL Open Font License 1.1. See assets/fonts/OFL-NotoKhmer.txt.
 - Fonts from craft-fonts (https://github.com/storytold/craft-fonts), an optional build input
   (CRAFT_FONTS_DIR) that is not part of this repository. Builds made with it, which includes every
   official release, embed the fonts listed in

@@ -4,7 +4,7 @@
 
 Every asset PDFKraft includes, bundles or uses to build its published material, with its author, source and licence. The policy is in [AGENTS.md](AGENTS.md) §1. The machine-readable list, with the SHA-256 of every asset but the translation catalogs, is [ATTRIBUTION.toml](ATTRIBUTION.toml). Licence texts are kept beside the assets and summarised in [NOTICE](NOTICE).
 
-## In this repository (289)
+## In this repository (293)
 
 | Asset | Title | Author | Licence | Source | Used for |
 |---|---|---|---|---|---|
@@ -211,6 +211,10 @@ Every asset PDFKraft includes, bundles or uses to build its published material, 
 | `assets/icons/x.svg` | Lucide icon "x" | Lucide Contributors (portions Cole Bemis, Feather) | ISC | https://github.com/lucide-icons/lucide (npm lucide-static 1.49.0, icons/x.svg) | UI icon, embedded via crates/ui-egui/src/icon_data.rs |
 | `assets/icons/zoom-in.svg` | Lucide icon "zoom-in" | Lucide Contributors (portions Cole Bemis, Feather) | ISC | https://github.com/lucide-icons/lucide (npm lucide-static 1.49.0, icons/zoom-in.svg) | UI icon, embedded via crates/ui-egui/src/icon_data.rs |
 | `assets/icons/zoom-out.svg` | Lucide icon "zoom-out" | Lucide Contributors (portions Cole Bemis, Feather) | ISC | https://github.com/lucide-icons/lucide (npm lucide-static 1.49.0, icons/zoom-out.svg) | UI icon, embedded via crates/ui-egui/src/icon_data.rs |
+| `assets/fonts/NotoSansKhmer-Regular.ttf` | Noto Sans Khmer Regular | The Noto Project Authors | OFL-1.1 | https://github.com/notofonts/khmer/releases/tag/NotoSansKhmer-v2.004 (NotoSansKhmer-v2.004.zip, unhinted/ttf) | Khmer document face for Add text (shaped with harfrust, drawn as Type 3 outlines with ToUnicode); the Sans Regular face is also the interface fallback for Khmer text, embedded in the app |
+| `assets/fonts/NotoSansKhmer-Bold.ttf` | Noto Sans Khmer Bold | The Noto Project Authors | OFL-1.1 | https://github.com/notofonts/khmer/releases/tag/NotoSansKhmer-v2.004 (NotoSansKhmer-v2.004.zip, unhinted/ttf) | Khmer document face for Add text (shaped with harfrust, drawn as Type 3 outlines with ToUnicode); the Sans Regular face is also the interface fallback for Khmer text, embedded in the app |
+| `assets/fonts/NotoSerifKhmer-Regular.ttf` | Noto Serif Khmer Regular | The Noto Project Authors | OFL-1.1 | https://github.com/notofonts/khmer/releases/tag/NotoSerifKhmer-v2.004 (NotoSerifKhmer-v2.004.zip, unhinted/ttf) | Khmer document face for Add text (shaped with harfrust, drawn as Type 3 outlines with ToUnicode); the Sans Regular face is also the interface fallback for Khmer text, embedded in the app |
+| `assets/fonts/NotoSerifKhmer-Bold.ttf` | Noto Serif Khmer Bold | The Noto Project Authors | OFL-1.1 | https://github.com/notofonts/khmer/releases/tag/NotoSerifKhmer-v2.004 (NotoSerifKhmer-v2.004.zip, unhinted/ttf) | Khmer document face for Add text (shaped with harfrust, drawn as Type 3 outlines with ToUnicode); the Sans Regular face is also the interface fallback for Khmer text, embedded in the app |
 | `assets/fonts/Inter-Regular.ttf` | Inter Regular | The Inter Project Authors (Rasmus Andersson) | OFL-1.1 | https://github.com/rsms/inter | UI font, embedded in the app; demo PDF labels; slanted fallback glyphs in Fill & Sign typed signatures for characters Dancing Script lacks (Cyrillic, Greek), drawn as filled paths |
 | `assets/fonts/Inter-Medium.ttf` | Inter Medium | The Inter Project Authors (Rasmus Andersson) | OFL-1.1 | https://github.com/rsms/inter | UI font, embedded in the app; demo PDF labels |
 | `assets/fonts/Inter-SemiBold.ttf` | Inter SemiBold | The Inter Project Authors (Rasmus Andersson) | OFL-1.1 | https://github.com/rsms/inter | UI font, embedded in the app; demo PDF labels |
