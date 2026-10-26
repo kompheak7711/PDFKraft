@@ -36,12 +36,21 @@ fn style(a: &Args, t: &mut AddedText) -> Result<()> {
         t.size = s;
     }
     if let Some(f) = a.opt_str("font")? {
-        t.family = match f.to_ascii_lowercase().as_str() {
-            "helvetica" | "sans" | "arial" => FontFamily::Helvetica,
-            "times" | "serif" => FontFamily::Times,
-            "courier" | "mono" | "monospace" => FontFamily::Courier,
-            other => return Err(bad(format!("unknown font {other:?} (helvetica, times, courier)"))),
-        };
+        // One list, as in the format panel: a standard family (Khmer letters then follow it), or a
+        // bundled Khmer family (the Latin beside it follows: Times for a serif family, else Helvetica).
+        let families = pdfkraft_fonts::khmer_families();
+        if let Some(k) = families.iter().find(|k| k.eq_ignore_ascii_case(f)) {
+            t.khmer_font = Some((*k).to_string());
+            t.family = if pdfkraft_fonts::khmer_family_is_serif(k) { FontFamily::Times } else { FontFamily::Helvetica };
+        } else {
+            t.family = match f.to_ascii_lowercase().as_str() {
+                "helvetica" | "sans" | "arial" => FontFamily::Helvetica,
+                "times" | "serif" => FontFamily::Times,
+                "courier" | "mono" | "monospace" => FontFamily::Courier,
+                other => return Err(bad(format!("unknown font {other:?} (helvetica, times, courier, or a Khmer family: {})", families.join(", ")))),
+            };
+            t.khmer_font = None;
+        }
     }
     if let Some(b) = a.opt_bool("bold")? {
         t.bold = b;

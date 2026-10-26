@@ -267,6 +267,18 @@ pub fn khmer_face_for(family: &str, bold: bool) -> Option<usize> {
     bold.then(|| of("Bold")).flatten().or_else(|| of("Regular")).or_else(|| KHMER_FACES.iter().position(|f| f.family == family))
 }
 
+/// Whether a bundled Khmer family is a serif face, so Latin text beside it takes Times rather
+/// than Helvetica when the family is picked from the one font list.
+pub fn khmer_family_is_serif(family: &str) -> bool {
+    family.contains("Serif")
+}
+
+/// Whether a bundled Khmer family is a serif face, so Latin text beside it takes Times rather
+/// than Helvetica when the family is picked from the one font list.
+pub fn khmer_family_is_serif(family: &str) -> bool {
+    family.contains("Serif")
+}
+
 /// The index into [`KHMER_FACES`] used when the item names no Khmer family: Noto Serif Khmer
 /// for a serif (Times) item, else Noto Sans Khmer, Bold when asked for.
 pub fn default_khmer_face(serif: bool, bold: bool) -> usize {
@@ -558,6 +570,10 @@ mod khmer_tests {
         assert_eq!(khmer_face_for("Khmer OS Muol", true), khmer_face_for("Khmer OS Muol", false));
         assert_eq!(khmer_face(khmer_face_for("Khmer OS Muol", true).unwrap()).map(|f| f.family), Some("Khmer OS Muol"));
         assert_eq!(khmer_face_for("Khmer Nowhere", false), None);
+        assert!(khmer_family_is_serif("Noto Serif Khmer"));
+        assert!(khmer_families().iter().filter(|f| khmer_family_is_serif(f)).count() == 1);
+        assert!(khmer_family_is_serif("Noto Serif Khmer"));
+        assert!(khmer_families().iter().filter(|f| khmer_family_is_serif(f)).count() == 1);
         assert!(khmer_face(KHMER_FACE_COUNT).is_none());
         for (serif, bold) in [(false, false), (false, true), (true, false), (true, true)] {
             let i = default_khmer_face(serif, bold);

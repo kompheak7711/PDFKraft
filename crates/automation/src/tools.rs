@@ -73,6 +73,13 @@ fn comment_ref(mut extra: Value) -> Value {
     extra
 }
 
+/// The `font` values of the added-text tools: the standard families and the bundled Khmer families.
+fn added_text_fonts() -> Vec<String> {
+    let mut out: Vec<String> = ["helvetica", "times", "courier"].iter().map(|s| (*s).to_string()).collect();
+    out.extend(pdfkraft_fonts::khmer_families().into_iter().map(str::to_string));
+    out
+}
+
 fn schema(props: Value, required: &[&str]) -> Value {
     json!({ "type": "object", "properties": props, "required": required, "additionalProperties": false })
 }
@@ -600,11 +607,11 @@ pub fn tools() -> Vec<ToolDef> {
                 "at": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
                 "width": { "type": "number", "exclusiveMinimum": 0 },
                 "rect": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
-                "font": { "type": "string", "enum": ["helvetica", "times", "courier"] }, "size": { "type": "number", "minimum": 1, "maximum": 500 },
+                "font": { "type": "string", "enum": added_text_fonts(), "description": "A standard family (Khmer letters then use Noto Sans Khmer, or Noto Serif Khmer with times) or a bundled Khmer family (the Latin beside it uses Times for a serif family, else Helvetica)." }, "size": { "type": "number", "minimum": 1, "maximum": 500 },
                 "bold": { "type": "boolean" }, "italic": { "type": "boolean" }, "color": { "type": "string" },
                 "align": { "type": "string", "enum": ["left", "center", "right", "justify"] },
                 "char_spacing": { "type": "number", "minimum": -500, "maximum": 500, "description": "Points after each character." },
-                "khmer_font": { "type": "string", "enum": pdfkraft_fonts::khmer_families(), "description": "The bundled family for Khmer letters; omitted: Noto Sans Khmer, or Noto Serif Khmer with font times." },
+                "khmer_font": { "type": "string", "enum": pdfkraft_fonts::khmer_families(), "description": "The bundled family for Khmer letters alone, keeping font for the Latin; omitted: it follows font." },
             }),
             &["doc", "page", "text"],
         )),
@@ -623,11 +630,11 @@ pub fn tools() -> Vec<ToolDef> {
                 json!({
                     "doc": doc(), "page": { "type": "integer", "minimum": 1 }, "index": { "type": "integer", "minimum": 1 },
                     "rect": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 }, "text": { "type": "string" },
-                    "font": { "type": "string", "enum": ["helvetica", "times", "courier"] }, "size": { "type": "number", "minimum": 1, "maximum": 500 },
+                    "font": { "type": "string", "enum": added_text_fonts(), "description": "A standard family or a bundled Khmer family, as in page_add_text." }, "size": { "type": "number", "minimum": 1, "maximum": 500 },
                     "bold": { "type": "boolean" }, "italic": { "type": "boolean" }, "color": { "type": "string" },
                     "align": { "type": "string", "enum": ["left", "center", "right", "justify"] },
                     "char_spacing": { "type": "number", "minimum": -500, "maximum": 500, "description": "Points after each character." },
-                    "khmer_font": { "type": "string", "enum": pdfkraft_fonts::khmer_families(), "description": "The bundled family for Khmer letters; \"default\" follows the font." },
+                    "khmer_font": { "type": "string", "enum": pdfkraft_fonts::khmer_families(), "description": "The bundled family for Khmer letters alone; \"default\" follows the font." },
                     "rotate": { "type": "integer" }, "flip_h": { "type": "boolean" }, "flip_v": { "type": "boolean" },
                     "crop": { "type": "array", "items": { "type": "number", "minimum": 0, "maximum": 0.95 }, "minItems": 4, "maxItems": 4, "description": "Fractions trimmed: left, bottom, right, top. Left and right together, and bottom and top together, trim at most 0.95." },
                     "image": { "type": "string", "description": "Replace the picture with this file." },

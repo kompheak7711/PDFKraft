@@ -38,10 +38,12 @@ source-level evidence is in
   embedded in every build, the web build included: Noto Sans Khmer and Noto Serif Khmer (Regular
   and Bold, SIL Open Font License), Khmer OS Battambang, Khmer OS Muol and Khmer OS Siemreap
   (Danh Hong, LGPL 2.1 or later), and Khmer M1, Khmer M2, Khmer S1 and Khmer S2 (LIM
-  Sovanvichet, LGPL 2.1 or later). The format panel's **Khmer font** list picks one per text
-  box; left on "follow the font", Helvetica and Courier items use Noto Sans Khmer, Times items
-  Noto Serif Khmer, and bold text the Bold face. No download, no optional build input, no
-  system font.
+  Sovanvichet, LGPL 2.1 or later). They sit in the format panel's one font list under
+  Helvetica, Times and Courier. With a standard family selected, Khmer letters use Noto Sans
+  Khmer (Noto Serif Khmer with Times) and bold text the Bold face, so switching the keyboard to
+  Khmer is all it takes; picking a Khmer family draws the Khmer letters with that face and the
+  Latin beside them with Helvetica (Times for Noto Serif Khmer). No download, no optional build
+  input, no system font.
 - **Khmer on screen.** Noto Sans Khmer is in the interface font stack, so file names, document
   titles and the text you are typing into an Add text box show in Khmer.
 - **Khmer word wrapping.** Khmer has no spaces between words. Lines break at a zero-width space
@@ -62,11 +64,12 @@ and the MCP server, is PdfCraft's work, unchanged.
 3. Click where the text should start. Switch your keyboard to Khmer (NiDA, Khmer Unicode or the
    layout your system ships) and type. Type a space or a zero-width space between words if you
    want lines to break there.
-4. Pick the family, size, colour and bold in the format panel, and the **Khmer font** (Noto
-   Sans or Serif Khmer, Khmer OS Battambang, Muol or Siemreap, Khmer M1, M2, S1 or S2). Left
-   on "follow the font", Helvetica and Courier items are written in Noto Sans Khmer and Times
-   items in Noto Serif Khmer. The choice is saved with the text box and comes back when you
-   reopen the file.
+4. Pick the font, size, colour and bold in the format panel. The font list holds Helvetica,
+   Times and Courier and then the Khmer families (Noto Sans and Serif Khmer, Khmer OS
+   Battambang, Muol and Siemreap, Khmer M1, M2, S1 and S2). You do not have to change the font
+   to type Khmer: under Helvetica or Courier it is written in Noto Sans Khmer, under Times in
+   Noto Serif Khmer. Pick a Khmer family to use that face instead. The choice is saved with the
+   text box and comes back when you reopen the file.
 5. Click **Done** (or click elsewhere on the page). The page redraws with the shaped text.
 
 Mixed text works: Khmer, Latin, Thai, Arabic and Hebrew can share one text box, each in its own
@@ -110,7 +113,7 @@ For example, this script adds Khmer text to the first page and saves a copy:
 ```json
 [
   {"tool": "doc_open", "args": {"path": "in.pdf"}},
-  {"tool": "page_add_text", "args": {"doc": 1, "page": 1, "text": "ភាសាខ្មែរ", "at": [72, 72], "size": 14, "khmer_font": "Khmer OS Muol"}},
+  {"tool": "page_add_text", "args": {"doc": 1, "page": 1, "text": "ភាសាខ្មែរ", "at": [72, 72], "size": 14, "font": "Khmer OS Muol"}},
   {"tool": "doc_save", "args": {"doc": 1, "path": "out.pdf"}}
 ]
 ```

@@ -9207,4 +9207,19 @@ fn khmer_text_through_tools_saves_reopens_extracts_and_renders() {
         .unwrap_err()
         .to_string();
     assert!(err.contains("Khmer OS Battambang"), "{err}");
+    // One list: `font` takes a Khmer family too, and the Latin beside it follows (Times for a serif family).
+    ok(&mut a, "page_add_text", json!({"doc": again, "page": 1, "text": "មូល Muol", "at": [10, 80], "font": "khmer os muol"}));
+    let items = ok(&mut a, "content_list", json!({"doc": again}))["items"].clone();
+    assert_eq!(items[1]["khmer_font"], "Khmer OS Muol");
+    assert_eq!(items[1]["font"], "Helvetica");
+    ok(&mut a, "content_update", json!({"doc": again, "page": 1, "index": 2, "font": "Noto Serif Khmer"}));
+    let items = ok(&mut a, "content_list", json!({"doc": again}))["items"].clone();
+    assert_eq!(items[1]["khmer_font"], "Noto Serif Khmer");
+    assert_eq!(items[1]["font"], "Times");
+    // Back to a standard family: the Khmer letters follow it again.
+    ok(&mut a, "content_update", json!({"doc": again, "page": 1, "index": 2, "font": "courier"}));
+    let items = ok(&mut a, "content_list", json!({"doc": again}))["items"].clone();
+    assert!(items[1].get("khmer_font").is_none(), "{:?}", items[1]);
+    assert_eq!(items[1]["font"], "Courier");
+    assert!(page_text(&mut a, again)[0].contains("មូល Muol"));
 }

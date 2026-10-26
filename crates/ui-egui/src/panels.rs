@@ -542,7 +542,7 @@ fn format_section(app: &mut PDFKraftApp, ui: &mut egui::Ui, t: &Tokens) {
             .map(|f| (f.resource, f.face))
             .collect();
         let shown = ed.font_shown(&sources);
-        let out = crate::format_text_ui::panel(ui, t, &mut ed.look, Some(&mut ed.extras), Fonts { sources: Some(&sources), shown });
+        let out = crate::format_text_ui::panel(ui, t, &mut ed.look, Some(&mut ed.extras), Fonts { sources: Some(&sources), shown, khmer: None });
         let mut changed = out.changed;
         match out.font {
             Some(FontChoice::KeepSource) => {
@@ -562,7 +562,8 @@ fn format_section(app: &mut PDFKraftApp, ui: &mut egui::Ui, t: &Tokens) {
             Some(FontChoice::Installed(path)) => app.use_paths(crate::files::FilePurpose::TextFont { page: ed.page }, &[path]),
             #[cfg(target_arch = "wasm32")]
             Some(FontChoice::Installed(_)) => {}
-            None => {}
+            // Existing text keeps its own fonts; the Khmer families are offered for added text only.
+            Some(FontChoice::Khmer(_)) | None => {}
         }
         if changed {
             app.apply_line_format(i, ed, Some(ui.ctx()));
@@ -620,33 +621,29 @@ fn format_section(app: &mut PDFKraftApp, ui: &mut egui::Ui, t: &Tokens) {
 }
 
 /// Format text for added text: the standard families, size, colour, style and alignment.
+/// Format text for added text: one font list with the standard families and the bundled Khmer
+/// families, then size, colour, style and alignment. A standard family draws Khmer letters with
+/// Noto Sans Khmer (Noto Serif Khmer for Times); a Khmer family draws them with that face and
+/// the Latin beside them with Times when it is a serif family, else Helvetica.
 fn added_text_format(ui: &mut egui::Ui, t: &Tokens, style: &mut pdfkraft_engine::AddedText) {
-    let shown = style.family.label().to_string();
-    let out = crate::format_text_ui::panel(ui, t, style, None, crate::format_text_ui::Fonts { sources: None, shown });
-    if let Some(crate::format_text_ui::FontChoice::Family(family)) = out.font {
-        style.family = family;
+    let shown = style.khmer_font.clone().unwrap_or_else(|| style.family.label().to_string());
+    let fonts = crate::format_text_ui::Fonts { sources: None, shown, khmer: style.khmer_font.as_deref() };
+    let out = crate::format_text_ui::panel(ui, t, style, None, fonts);
+    match out.font {
+        Some(crate::format_text_ui::FontChoice::Family(family)) => {
+            style.family = family;
+            style.khmer_font = None;
+        }
+        Some(crate::format_text_ui::FontChoice::Khmer(family)) => {
+            style.khmer_font = Some(family.to_string());
+            style.family = if pdfkraft_fonts::khmer_family_is_serif(family) {
+                pdfkraft_engine::FontFamily::Times
+            } else {
+                pdfkraft_engine::FontFamily::Helvetica
+            };
+        }
+        _ => {}
     }
-    // The face for Khmer letters: one of the bundled families, or the one that follows the family.
-    ui.add_space(4.0);
-    let shown = match &style.khmer_font {
-        Some(f) => egui::WidgetText::from(f.as_str()),
-        None => tl!("Khmer: follow the font").into(),
-    };
-    egui::ComboBox::from_id_salt("format-khmer-font")
-        .selected_text(shown)
-        .width(ui.available_width())
-        .show_ui(ui, |ui| {
-            if ui.selectable_label(style.khmer_font.is_none(), tl!("Khmer: follow the font")).clicked() {
-                style.khmer_font = None;
-            }
-            for family in pdfkraft_fonts::khmer_families() {
-                if ui.selectable_label(style.khmer_font.as_deref() == Some(family), family).clicked() {
-                    style.khmer_font = Some(family.to_string());
-                }
-            }
-        })
-        .response
-        .on_hover_text(tl!("The face for Khmer letters. Following the font means Noto Sans Khmer, or Noto Serif Khmer for Times."));
 }
 
 impl PDFKraftApp {

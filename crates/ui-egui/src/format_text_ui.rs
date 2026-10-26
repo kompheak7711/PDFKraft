@@ -25,6 +25,10 @@ pub(crate) enum FontChoice {
     Resource(String),
     /// A standard family.
     Family(FontFamily),
+    /// One of the bundled Khmer families (added text only).
+    Khmer(&'static str),
+    /// One of the bundled Khmer families (added text only).
+    Khmer(&'static str),
     /// Load font…: pick a font file.
     Load,
     /// A font file installed on this computer.
@@ -38,6 +42,8 @@ pub(crate) struct Fonts<'a> {
     pub sources: Option<&'a [(String, String)]>,
     /// The name the list shows for the current choice.
     pub shown: String,
+    /// For added text: the Khmer family the item names, if any, so the list marks it as chosen.
+    pub khmer: Option<&'a str>,
 }
 
 /// What the panel changed: the style (in place) and a font picked from the list.
@@ -94,8 +100,20 @@ pub(crate) fn panel(ui: &mut egui::Ui, t: &Tokens, look: &mut AddedText, extras:
                 ui.separator();
             }
             for f in [FontFamily::Helvetica, FontFamily::Times, FontFamily::Courier] {
-                if ui.selectable_label(fonts.sources.is_none() && look.family == f, f.label()).clicked() {
+                if ui.selectable_label(fonts.sources.is_none() && fonts.khmer.is_none() && look.family == f, f.label()).clicked() {
                     out.font = Some(FontChoice::Family(f));
+                }
+            }
+            // Added text: the bundled Khmer families in the same list. Khmer typed under a
+            // standard family already takes Noto Sans Khmer (Noto Serif Khmer for Times); picking
+            // a Khmer family changes the face of the Khmer letters, and the Latin beside them
+            // follows (Times for a serif family, else Helvetica).
+            if fonts.sources.is_none() {
+                ui.separator();
+                for family in pdfkraft_fonts::khmer_families() {
+                    if ui.selectable_label(fonts.khmer == Some(family), family).clicked() {
+                        out.font = Some(FontChoice::Khmer(family));
+                    }
                 }
             }
             if fonts.sources.is_some() {
@@ -123,7 +141,15 @@ pub(crate) fn panel(ui: &mut egui::Ui, t: &Tokens, look: &mut AddedText, extras:
             }
         })
         .response
-        .on_hover_text(format!("{}\n{}", tl!("Font"), tl!("Thai and Arabic use regular fallback fonts when available.")));
+        .on_hover_text(format!(
+            "{}\n{}",
+            tl!("Font"),
+            if fonts.sources.is_none() {
+                tl!("Khmer letters use Noto Sans Khmer (Noto Serif Khmer with Times) unless a Khmer family is picked. Thai and Arabic use regular fallback fonts when available.")
+            } else {
+                tl!("Thai and Arabic use regular fallback fonts when available.")
+            }
+        ));
     ui.add_space(4.0);
 
     // Size and colour | bullets, numbering and alignment.
