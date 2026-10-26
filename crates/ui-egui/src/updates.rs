@@ -10,6 +10,13 @@ use crate::{PDFKraftApp, theme, widgets};
 /// Where every PDFKraft release is listed.
 pub const RELEASES_PAGE: &str = "https://github.com/kompheak7711/PDFKraft/releases";
 
+/// PDFKraft's identity for the updater: the releases of the PDFKraft repository, with assets
+/// named `pdfkraft-<version>-…` as `packaging/` produces them. craft-update's own suite lists the
+/// Crafting Apps, and a fork must not update itself from upstream's releases.
+#[cfg(not(target_arch = "wasm32"))]
+pub const APP: craft_update::App =
+    craft_update::App::new("pdfkraft", "PDFKraft", "Reading, organizing and protecting PDFs, and typing Khmer", "kompheak7711/PDFKraft");
+
 /// Stands in for the network in tests.
 #[cfg(not(target_arch = "wasm32"))]
 pub type UpdateSource = CheckSource;
@@ -30,7 +37,7 @@ impl Default for Updates {
     fn default() -> Self {
         Self {
             #[cfg(not(target_arch = "wasm32"))]
-            updater: Updater::new(&craft_update::suite::PDFKRAFT, env!("CARGO_PKG_VERSION")),
+            updater: Updater::new(&APP, env!("CARGO_PKG_VERSION")),
             open: false,
             #[cfg(not(target_arch = "wasm32"))]
             startup_check: false,
@@ -50,7 +57,7 @@ impl PDFKraftApp {
     /// Replaces the network with `source` (tests).
     #[cfg(not(target_arch = "wasm32"))]
     pub fn set_update_source(&mut self, source: UpdateSource) {
-        self.updates.updater = Updater::new(&craft_update::suite::PDFKRAFT, env!("CARGO_PKG_VERSION")).with_source(source);
+        self.updates.updater = Updater::new(&APP, env!("CARGO_PKG_VERSION")).with_source(source);
     }
 
     /// Help ▸ Check for updates: ask for the latest release and show the outcome.
