@@ -59,6 +59,11 @@ set). Without that variable `CRAFT_FONTS` is empty and everything below copes:
   and shaped Thai Add Text content. Harfrust positions stacked vowel/tone marks and decomposes
   Sara Am; cluster ToUnicode entries preserve the original text. The shared Type 3 writer
   embeds outlines, so reopening does not depend on installed fonts.
+- `ui_khmer_fonts` / `document_khmer_font(serif, bold)` / `shape_khmer` / `khmer_has`: the
+  **bundled** Noto Sans Khmer and Noto Serif Khmer faces (`assets/fonts`, Regular and Bold), so
+  Khmer Add Text works in every build, craft-fonts or not. Harfrust runs the Khmer shaper (coeng
+  subscripts, pre-base vowel reordering, mark positioning); clusters are graphemes, drawn by the
+  shared Type 3 writer with ToUnicode. A Times item takes the serif face, bold text the Bold one.
 - `SHIPPORI_MINCHO`: Shippori Mincho's bytes, or `None`.
 
 Generated Japanese Type 3 fonts record the fallback face's family and style in an indirect

@@ -946,3 +946,22 @@ fn a_resized_added_picture_shows_only_at_its_new_size() {
     let pixels = h.render().unwrap();
     assert!(red(&pixels, kept) > 100 && red(&pixels, gone) == 0, "the page raster has the picture at its new size");
 }
+
+/// Khmer typed into an Add text box shows in the bundled interface face while typing (the
+/// subscript and vowel-sign glyphs come from Noto Sans Khmer), and commits whole to the page.
+#[test]
+fn typing_khmer_text_keeps_clusters_and_commits_to_page() {
+    let fonts = pdfkraft_ui_egui::theme::font_definitions();
+    let face = pdfkraft_fonts::ui_khmer_fonts()[0];
+    assert!(fonts.families[&egui::FontFamily::Proportional].contains(&face.name()));
+    let mut h = harness();
+    assert!(h.state_mut().execute("edit.text"));
+    h.run_steps(2);
+    let p = at(&h, 40.0, 100.0);
+    click(&mut h, p);
+    h.event(egui::Event::Text("ខ្មែរ យូនីកូដ Hello".into()));
+    h.run_steps(3);
+    let p = at(&h, 40.0, 200.0);
+    click(&mut h, p);
+    assert_eq!(texts(&h), ["ខ្មែរ យូនីកូដ Hello"]);
+}

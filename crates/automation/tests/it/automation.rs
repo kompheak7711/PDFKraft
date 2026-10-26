@@ -9175,3 +9175,23 @@ fn page_render_draws_stamps_without_an_appearance() {
     let grey = custom.iter().filter(|p| p[0].abs_diff(p[1]) < 24 && p[1].abs_diff(p[2]) < 24).count();
     assert!(grey > 100 && grey == custom.len(), "an unknown name is a grey placeholder: {grey} of {}", custom.len());
 }
+
+/// Khmer through the tools: shaped by the bundled face, so no craft-fonts condition. The text
+/// survives save and reopen, extracts in typing order and renders.
+#[test]
+fn khmer_text_through_tools_saves_reopens_extracts_and_renders() {
+    let dir = workdir("khmer-content");
+    let mut a = auto(&dir);
+    let doc = ok(&mut a, "doc_open", json!({"path": "a.pdf"}))["doc"].as_u64().unwrap();
+    let text = "ភាសាខ្មែរ យូនីកូដ ១២៣ Hello 123";
+    ok(&mut a, "page_add_text", json!({"doc": doc, "page": 1, "text": text, "at": [10, 20], "size": 9}));
+    assert!(page_text(&mut a, doc)[0].contains(text), "{:?}", page_text(&mut a, doc));
+    ok(&mut a, "doc_save", json!({"doc": doc, "path": "khmer.pdf"}));
+    let reopened = ok(&mut a, "doc_open", json!({"path": "khmer.pdf"}))["doc"].as_u64().unwrap();
+    assert_eq!(ok(&mut a, "content_list", json!({"doc": reopened}))["items"][0]["text"], text);
+    assert!(page_text(&mut a, reopened)[0].contains(text));
+    let rendered = a.call("page_render", &json!({"doc": reopened, "page": 1, "dpi": 144})).unwrap();
+    assert!(rendered.iter().any(|c| matches!(c, Content::Png { data, width, height } if !data.is_empty() && *width > 0 && *height > 0)));
+    ok(&mut a, "content_update", json!({"doc": reopened, "page": 1, "index": 1, "text": "កែសម្រួល ខ្មែរ"}));
+    assert!(page_text(&mut a, reopened)[0].contains("កែសម្រួល ខ្មែរ"));
+}

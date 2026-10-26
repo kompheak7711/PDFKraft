@@ -7457,3 +7457,107 @@ fn a_run_of_spaces_in_a_subset_without_a_space_glyph_keeps_its_width() {
     let content = String::from_utf8_lossy(&page_content_bytes(&reopen(&doc), 0)).into_owned();
     assert_eq!(content.matches("[-330] TJ").count(), 5, "{content}");
 }
+
+/// Khmer Add text: shaped with the bundled Noto Khmer face (no craft-fonts needed), a coeng cluster
+/// is one glyph that ToUnicode maps back whole, lines break at zero-width spaces and never inside
+/// a cluster, a Times item takes the serif face, and what the face lacks is refused up front.
+#[test]
+fn added_khmer_text_is_shaped_wraps_at_word_marks_and_survives_reopen() {
+    let mut doc = fixture();
+    // ខ្មែរ: a coeng (U+17D2) subscript and the pre-base vowel ែ; then a zero-width space marking
+    // the word boundary, Khmer digits and Latin, all in one item.
+    let t = AddedText {
+        rect: [20.0, 100.0, 250.0, 300.0], text: "ខ្មែរ\u{200B}យូនីកូដ ១២៣ Hello".into(), size: 16.0, ..AddedText::default()
+    };
+    assert_eq!(first_undrawable(&t), None, "the bundled face draws every Khmer letter");
+    add_content(&mut doc, 0, &Content::Text(t.clone())).unwrap();
+    let reopened = reopen(&doc);
+    assert_eq!(list_added(&reopened)[0].content, Content::Text(AddedText { rect: super::added::text_rect(&t), ..t.clone() }));
+    let s = streams(&reopened, 0);
+    // The Latin run keeps the space before it: `( Hello) Tj`.
+    let item = s.iter().find(|s| s.contains("Hello) Tj")).unwrap_or_else(|| panic!("{s:?}"));
+    // Copy and search get the typed order back; the zero-width space is layout, not content.
+    let logical: String = "ខ្មែរយូនីកូដ ១២៣ Hello".encode_utf16().map(|u| format!("{u:04X}")).collect();
+    assert!(item.contains(&format!("/ActualText <FEFF{logical}>")), "{item}");
+    // The glyphs come from Type 3 fonts named after the bundled face, whose ToUnicode map gives
+    // back each cluster whole: ខ្មែ is one glyph standing for four characters.
+    let p = &pdfkraft_model::pages(&reopened)[0];
+    let res = reopened.resolve(p.dict.get(b"Resources").unwrap());
+    let fonts = reopened.resolve(res.as_dict().unwrap().get(b"Font").unwrap()).as_dict().unwrap().clone();
+    let shaped: Vec<_> = fonts.iter().filter(|(k, _)| k.starts_with(b"PCAr")).map(|(_, v)| reopened.resolve(v).as_dict().unwrap().clone()).collect();
+    assert!(!shaped.is_empty());
+    let mut mapped = String::new();
+    for f in &shaped {
+        assert_eq!(f.name(b"Subtype"), Some(&b"Type3"[..]));
+        mapped += &String::from_utf8_lossy(&stream_bytes(&reopened, f.get(b"ToUnicode").unwrap()).unwrap());
+    }
+    assert!(mapped.contains("<178117D2179817C2>"), "{mapped}");
+    let font_name = |doc: &Document, f: &Dict| {
+        doc.resolve(f.get(b"FontDescriptor").unwrap()).as_dict().unwrap().name(b"FontName").map(|n| String::from_utf8_lossy(n).into_owned())
+    };
+    assert!(
+        shaped.iter().any(|f| font_name(&reopened, f).as_deref() == Some("NotoSansKhmer")),
+        "{:?}",
+        shaped.iter().map(|f| font_name(&reopened, f)).collect::<Vec<_>>()
+    );
+    // Wrapping: as the box narrows, the first break lands on the zero-width space (never inside a
+    // word while a word boundary is on the line), and no line ever starts with a subscript or a
+    // vowel sign, that is, inside a cluster.
+    let mut first_break = None;
+    for w in (12..=200).rev().step_by(2) {
+        let narrow = AddedText { rect: [0.0, 0.0, f64::from(w), 200.0], text: "ខ្មែរ\u{200B}យូនីកូដ".into(), ..t.clone() };
+        let ls = super::added::lines(&narrow);
+        assert_eq!(ls.concat(), "ខ្មែរយូនីកូដ", "{ls:?} at {w}");
+        assert!(ls.iter().all(|l| !l.is_empty() && !l.starts_with(['\u{17D2}', '\u{17C2}', '\u{17BC}', '\u{17B8}'])), "{ls:?} at {w}");
+        if ls.len() > 1 && first_break.is_none() {
+            first_break = Some(ls.clone());
+        }
+    }
+    assert_eq!(first_break.as_deref(), Some(&["ខ្មែរ".to_string(), "យូនីកូដ".to_string()][..]));
+    let tight = AddedText { rect: [0.0, 0.0, 16.0, 200.0], text: "ខ្មែខ្មែខ្មែ".into(), ..t.clone() };
+    assert_eq!(super::added::lines(&tight), ["ខ្មែ", "ខ្មែ", "ខ្មែ"]);
+    // A bold Times item takes Noto Serif Khmer Bold.
+    let serif =
+        AddedText { family: Family::Times, bold: true, rect: [20.0, 500.0, 250.0, 520.0], text: "ភាសាខ្មែរ".into(), ..t.clone() };
+    add_content(&mut doc, 0, &Content::Text(serif)).unwrap();
+    let p = &pdfkraft_model::pages(&doc)[0];
+    let res = doc.resolve(p.dict.get(b"Resources").unwrap());
+    let fonts = doc.resolve(res.as_dict().unwrap().get(b"Font").unwrap()).as_dict().unwrap().clone();
+    let names: Vec<String> =
+        fonts.iter().filter(|(k, _)| k.starts_with(b"PCAr")).filter_map(|(_, v)| font_name(&doc, doc.resolve(v).as_dict().unwrap())).collect();
+    assert!(names.iter().any(|n| n == "NotoSerifKhmer"), "{names:?}");
+    // What the face lacks is refused before anything is written.
+    let bad = Content::Text(AddedText { text: "ខ្មែរ 日".into(), ..t });
+    let before = list_added(&doc);
+    assert!(update_content(&mut doc, 0, 0, &bad).is_err());
+    assert_eq!(list_added(&doc), before);
+    delete_content(&mut doc, 0, 1).unwrap();
+    delete_content(&mut doc, 0, 0).unwrap();
+    assert!(list_added(&doc).is_empty());
+}
+
+/// Odd Khmer input never panics: lone marks, coeng without a base, controls, mixed scripts.
+#[test]
+fn odd_khmer_text_never_panics() {
+    for s in [
+        "\u{17D2}",
+        "\u{17D2}\u{17D2}\u{17D2}",
+        "\u{17C2}",
+        "ក\u{17D2}",
+        "\u{200B}\u{200B}",
+        "ក\u{200B}",
+        "\u{200B}ក",
+        "ខ្មែរ\u{200D}ខ្មែរ\u{200C}",
+        "ខ្មែរ العربية ខ្មែរ",
+        "ខ្មែរ עברית",
+        "ไทย ខ្មែរ",
+        "ក ".repeat(300).as_str(),
+        "ខ្មែរ\nខ្មែរ\n\n",
+    ] {
+        let t = AddedText { rect: [10.0, 10.0, 60.0, 100.0], text: s.into(), size: 12.0, ..AddedText::default() };
+        let _ = super::added::lines(&t);
+        let _ = first_undrawable(&t);
+        let mut doc = fixture();
+        let _ = add_content(&mut doc, 0, &Content::Text(t));
+    }
+}

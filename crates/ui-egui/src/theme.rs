@@ -306,9 +306,9 @@ pub fn installed_font_definitions(cjk: CjkPreference) -> FontDefinitions {
 }
 
 /// The interface fonts: Inter (and JetBrains Mono for code) first, then egui's defaults, then
-/// the CJK, Arabic, Telugu, Hebrew and Thai faces of the optional craft-fonts build input as the
-/// last fallback in every family. Without craft-fonts there is no Japanese, Chinese, Arabic,
-/// Telugu, Hebrew or Thai face here.
+/// the CJK, Arabic, Telugu, Hebrew and Thai faces of the optional craft-fonts build input and the
+/// bundled Khmer face as the last fallback in every family. Without craft-fonts there is no
+/// Japanese, Chinese, Arabic, Telugu, Hebrew or Thai face here; Khmer is always there.
 pub fn font_definitions() -> FontDefinitions {
     font_definitions_for(false)
 }
@@ -390,6 +390,7 @@ fn font_definitions_for_platform(prefer_hans: bool, platform: FontPolicyPlatform
         .chain(pdfkraft_fonts::ui_telugu_fonts())
         .chain(pdfkraft_fonts::ui_hebrew_fonts())
         .chain(pdfkraft_fonts::ui_thai_fonts())
+        .chain(pdfkraft_fonts::ui_khmer_fonts())
         .chain(pdfkraft_fonts::ui_devanagari_fonts())
     {
         let name = face.name();

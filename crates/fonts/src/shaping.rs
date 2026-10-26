@@ -1,4 +1,5 @@
-//! Arabic, Hebrew and Thai text shaping with the matching craft-fonts face and bounded glyph outlines.
+//! Arabic, Hebrew, Thai and Khmer text shaping with the matching face (craft-fonts, or the bundled
+//! Noto Khmer) and bounded glyph outlines.
 
 use std::sync::OnceLock;
 
@@ -28,6 +29,12 @@ pub enum ShapedScript {
     Arabic,
     Hebrew,
     Thai,
+    /// The bundled Noto Khmer face for the item's family and weight: Serif for a Times item,
+    /// Bold when asked for. Each is its own face, so each has its own glyph ids and cache slot.
+    Khmer {
+        serif: bool,
+        bold: bool,
+    },
 }
 
 impl ShapedScript {
@@ -36,6 +43,7 @@ impl ShapedScript {
             Self::Arabic => crate::document_arabic_font(),
             Self::Hebrew => crate::document_hebrew_font(false),
             Self::Thai => crate::document_thai_font(),
+            Self::Khmer { serif, bold } => Some(crate::document_khmer_font(serif, bold)),
         }
     }
 }
@@ -44,10 +52,13 @@ fn face(script: ShapedScript) -> Option<&'static (FontRef<'static>, ShaperData)>
     static FACE: OnceLock<Option<(FontRef<'static>, ShaperData)>> = OnceLock::new();
     static HEBREW: OnceLock<Option<(FontRef<'static>, ShaperData)>> = OnceLock::new();
     static THAI: OnceLock<Option<(FontRef<'static>, ShaperData)>> = OnceLock::new();
+    // One slot per bundled Khmer face: sans/serif × regular/bold.
+    static KHMER: [OnceLock<Option<(FontRef<'static>, ShaperData)>>; 4] = [const { OnceLock::new() }; 4];
     let cache = match script {
         ShapedScript::Arabic => &FACE,
         ShapedScript::Hebrew => &HEBREW,
         ShapedScript::Thai => &THAI,
+        ShapedScript::Khmer { serif, bold } => KHMER.get(usize::from(serif) * 2 + usize::from(bold))?,
     };
     cache
         .get_or_init(|| {
@@ -91,6 +102,20 @@ pub fn shape_thai(text: &str) -> Result<Vec<ShapedCluster>, GlyphError> {
     shape_script(text, false, ShapedScript::Thai)
 }
 
+/// Whether the bundled Khmer faces have a glyph for `c` (they share one character set).
+pub fn khmer_has(c: char) -> bool {
+    face(ShapedScript::Khmer { serif: false, bold: false }).is_some_and(|(font, _)| font.charmap().map(c).is_some())
+}
+
+/// Shape Khmer with the bundled face for the item's style (`serif` for a Times item, `bold` for
+/// bold text), one cluster per grapheme: a consonant with its coeng (U+17D2) subscripts, vowel
+/// signs and diacritics stays together, so wrapping never splits it and ToUnicode gives the
+/// typed characters back whole. Pre-base vowels (ើ, ែ, …) are drawn before their consonant by
+/// the face's own OpenType tables, as the Khmer shaper reorders them.
+pub fn shape_khmer(text: &str, serif: bool, bold: bool) -> Result<Vec<ShapedCluster>, GlyphError> {
+    shape_script(text, false, ShapedScript::Khmer { serif, bold })
+}
+
 fn shape_script(text: &str, rtl: bool, kind: ShapedScript) -> Result<Vec<ShapedCluster>, GlyphError> {
     let (font, data) = face(kind).ok_or(GlyphError::NoFont)?;
     let shaper = data.shaper(font).build();
@@ -102,11 +127,13 @@ fn shape_script(text: &str, rtl: bool, kind: ShapedScript) -> Result<Vec<ShapedC
         ShapedScript::Arabic => script::ARABIC,
         ShapedScript::Hebrew => script::HEBREW,
         ShapedScript::Thai => script::THAI,
+        ShapedScript::Khmer { .. } => script::KHMER,
     });
-    // Preserve the historical Arabic per-character mapping; Hebrew and Thai marks stay with their base.
+    // Preserve the historical Arabic per-character mapping; Hebrew, Thai and Khmer marks (and
+    // Khmer subscripts) stay with their base.
     buffer.set_cluster_level(match kind {
         ShapedScript::Arabic => BufferClusterLevel::Characters,
-        ShapedScript::Hebrew | ShapedScript::Thai => BufferClusterLevel::MonotoneGraphemes,
+        ShapedScript::Hebrew | ShapedScript::Thai | ShapedScript::Khmer { .. } => BufferClusterLevel::MonotoneGraphemes,
     });
     let shaped = shaper.shape(buffer, ShapeOptions::new());
     // Clusters are byte offsets into `text`; a cluster shows the characters up to the next one.
@@ -297,5 +324,49 @@ mod hebrew_tests {
         assert!(hebrew_has('א') && hebrew_has('\u{05B8}') && !hebrew_has('日'));
         assert_eq!(shape_hebrew("日", true), Err(GlyphError::Missing));
         assert!(shape_hebrew("", true).unwrap().is_empty());
+    }
+}
+
+#[cfg(test)]
+mod khmer_tests {
+    use super::*;
+
+    const SANS: ShapedScript = ShapedScript::Khmer { serif: false, bold: false };
+
+    /// Khmer always shapes (the faces are bundled): clusters give the typed text back exactly once,
+    /// a consonant keeps its coeng subscript and vowel sign, and every glyph has a bounded outline.
+    #[test]
+    fn khmer_clusters_keep_subscripts_and_vowel_signs_with_their_consonant() {
+        assert!(khmer_has('ក') && khmer_has('\u{17D2}') && khmer_has('១') && !khmer_has('日'));
+        for text in ["ខ្មែរ", "ភាសាខ្មែរ", "សួស្តី", "ក្រុង", "ញ៉ាំ", "១២៣", "ឲ្យ", ""]
+        {
+            for (serif, bold) in [(false, false), (false, true), (true, false), (true, true)] {
+                let clusters = shape_khmer(text, serif, bold).unwrap();
+                assert_eq!(clusters.iter().map(|c| c.text.as_str()).collect::<String>(), text);
+                for c in clusters {
+                    assert_eq!(c.script, ShapedScript::Khmer { serif, bold });
+                    assert!(c.advance.is_finite() && c.advance >= 0.0);
+                    for (id, pos) in c.glyphs {
+                        assert!(pos.iter().all(|v| v.is_finite()));
+                        shaped_glyph(c.script, id).unwrap();
+                    }
+                }
+            }
+        }
+        // ខ្មែរ: KHA, COENG, MO, VOWEL SIGN AE, RO. The first four characters are one grapheme and
+        // must wrap together; the subscript MO and the pre-base AE are extra glyphs of that cluster.
+        let g = shape_khmer("ខ្មែរ", false, false).unwrap();
+        assert_eq!(g.iter().map(|c| c.text.as_str()).collect::<Vec<_>>(), ["ខ្មែ", "រ"], "{g:?}");
+        assert!(g[0].glyphs.len() >= 3, "{g:?}");
+        // The subscript sits below the baseline (a negative y offset), so GPOS positioning reached the cluster.
+        assert!(g[0].glyphs.iter().any(|(_, p)| p[1] < 0.0), "{g:?}");
+        // The pre-base vowel is drawn before the consonant: some glyph starts left of the consonant's pen.
+        let plain = shape_khmer("ខ", false, false).unwrap();
+        assert!(g[0].advance > plain[0].advance, "{g:?} {plain:?}");
+        // The four faces have their own glyph ids and outlines, never shared through one cache.
+        let serif = shape_khmer("ខ", true, false).unwrap();
+        assert_ne!(shaped_glyph(SANS, plain[0].glyphs[0].0).unwrap().contours, shaped_glyph(serif[0].script, serif[0].glyphs[0].0).unwrap().contours);
+        assert_eq!(shape_khmer("日", false, false), Err(GlyphError::Missing));
+        assert_eq!(shaped_glyph(SANS, u32::MAX).map(|_| ()), Err(GlyphError::Missing));
     }
 }

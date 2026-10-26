@@ -12,7 +12,8 @@ use std::collections::{HashMap, HashSet};
 
 use pdfkraft_cos::{Dict, Document, ObjRef, Object, PdfString, Stream};
 use pdfkraft_fonts::{
-    GlyphError, GlyphOutline, ShapedCluster, ShapedScript, Std14, literal, shape_arabic, shape_hebrew, shape_thai, shaped_glyph, win_ansi,
+    GlyphError, GlyphOutline, ShapedCluster, ShapedScript, Std14, literal, shape_arabic, shape_hebrew, shape_khmer, shape_thai, shaped_glyph,
+    win_ansi,
 };
 use unicode_bidi::{Level, ParagraphBidiInfo};
 
@@ -297,10 +298,11 @@ fn wrapped(t: &AddedText) -> Vec<(String, bool)> {
     for para in t.text.split('\n') {
         // Arabic or Hebrew: laid out with the bidirectional algorithm and shaped.
         let rtl_script = para.chars().any(|c| is_arabic(c) || is_hebrew(c));
-        let thai = para.chars().any(is_thai);
-        if thai
+        // Thai and Khmer: no spaces between words, so wrapped by shaped cluster.
+        let clustered = para.chars().any(|c| is_thai(c) || is_khmer(c));
+        if clustered
             && !rtl_script
-            && let Ok(lines) = thai_lines(t, para, width)
+            && let Ok(lines) = cluster_lines(t, para, width)
         {
             out.extend(lines.into_iter().map(|line| (line, false)));
             continue;
@@ -310,13 +312,16 @@ fn wrapped(t: &AddedText) -> Vec<(String, bool)> {
         // sum of its words' and shaping stays linear in the paragraph's length. The space is the
         // paragraph's; a space between Latin words is drawn in the item's font, a few hundredths
         // of an em apart.
-        let measure = |s: &str| if rtl_script || thai { shaped_width(t, s, rtl) } else { latin_width(t, s) };
+        let measure = |s: &str| if rtl_script || clustered { shaped_width(t, s, rtl) } else { latin_width(t, s) };
         let space = measure(" ");
         let (mut line, mut line_w) = (String::new(), 0.0);
         for word in para.split(' ') {
             let candidate = if line.is_empty() { word.to_string() } else { format!("{line} {word}") };
-            let candidate_w =
-                if rtl_script || thai { if line.is_empty() { measure(word) } else { line_w + space + measure(word) } } else { measure(&candidate) };
+            let candidate_w = if rtl_script || clustered {
+                if line.is_empty() { measure(word) } else { line_w + space + measure(word) }
+            } else {
+                measure(&candidate)
+            };
             if !line.is_empty() && candidate_w > width {
                 out.push((std::mem::take(&mut line), rtl));
                 line = word.to_string();
@@ -331,30 +336,58 @@ fn wrapped(t: &AddedText) -> Vec<(String, bool)> {
     out
 }
 
-/// Thai wrapping at shaped cluster boundaries never detaches a tone/vowel mark from its base.
-/// This is glyph-safe wrapping, not dictionary-based Thai word segmentation.
-fn thai_lines(t: &AddedText, para: &str, width: f64) -> Result<Vec<String>, EditError> {
-    let (pieces, _) = shaped_layout(t, para, false)?;
-    let mut atoms = Vec::new();
-    for piece in pieces {
-        match piece {
-            Piece::Shaped(clusters) => atoms.extend(clusters.into_iter().map(|c| (c.text, c.advance * t.size + t.char_spacing))),
-            Piece::Latin(s) => atoms.extend(s.chars().map(|c| {
-                let text = c.to_string();
-                let w = latin_width(t, &text);
-                (text, w)
-            })),
+/// Thai and Khmer wrapping at shaped cluster boundaries never detaches a tone or vowel mark, or a
+/// Khmer coeng subscript, from its base. Neither script puts spaces between words, so a line may
+/// break after any cluster; when the line holds a space or a zero-width space (U+200B, how Khmer
+/// text marks a word boundary) the break goes there instead. The zero-width spaces are not drawn
+/// and are left out of the lines. This is glyph-safe wrapping, not dictionary-based segmentation.
+fn cluster_lines(t: &AddedText, para: &str, width: f64) -> Result<Vec<String>, EditError> {
+    // (text, advance, a break is welcome after it)
+    let mut atoms: Vec<(String, f64, bool)> = Vec::new();
+    for (i, chunk) in para.split('\u{200B}').enumerate() {
+        if i > 0
+            && let Some(last) = atoms.last_mut()
+        {
+            last.2 = true;
+        }
+        let (pieces, _) = shaped_layout(t, chunk, false)?;
+        for piece in pieces {
+            match piece {
+                Piece::Shaped(clusters) => atoms.extend(clusters.into_iter().map(|c| (c.text, c.advance * t.size + t.char_spacing, false))),
+                Piece::Latin(s) => atoms.extend(s.chars().map(|c| {
+                    let text = c.to_string();
+                    let w = latin_width(t, &text);
+                    (text, w, c == ' ')
+                })),
+            }
         }
     }
     let mut lines = Vec::new();
     let (mut line, mut used) = (String::new(), 0.0);
-    for (text, advance) in atoms {
+    // The end of the line after its last break opportunity (a byte offset after whole atoms, so a
+    // char boundary) and the width used up to it.
+    let mut last_break: Option<(usize, f64)> = None;
+    for (text, advance, break_after) in atoms {
         if !line.is_empty() && used + advance > width {
-            lines.push(std::mem::take(&mut line));
-            used = 0.0;
+            match last_break.take() {
+                Some((at, w)) if at <= line.len() => {
+                    // The part after the last word boundary moves down with this atom.
+                    let tail = line.split_off(at);
+                    lines.push(std::mem::take(&mut line).trim_end_matches(' ').to_string());
+                    line = tail.trim_start_matches(' ').to_string();
+                    used = (used - w).max(0.0);
+                }
+                _ => {
+                    lines.push(std::mem::take(&mut line));
+                    used = 0.0;
+                }
+            }
         }
         line.push_str(&text);
         used += advance;
+        if break_after {
+            last_break = Some((line.len(), used));
+        }
     }
     lines.push(line);
     Ok(lines)
@@ -362,6 +395,12 @@ fn thai_lines(t: &AddedText, para: &str, width: f64) -> Result<Vec<String>, Edit
 
 fn is_thai(c: char) -> bool {
     matches!(u32::from(c), 0x0E00..=0x0E7F)
+}
+
+/// Khmer letters, vowel signs, coeng, digits and punctuation, and the Khmer Symbols block: an item
+/// with any of them is shaped with the bundled Noto Khmer face.
+fn is_khmer(c: char) -> bool {
+    matches!(u32::from(c), 0x1780..=0x17FF | 0x19E0..=0x19FF)
 }
 
 /// Arabic letters, marks, digits and punctuation: an item with any of them is shaped with the
@@ -381,6 +420,14 @@ fn is_hebrew(c: char) -> bool {
 /// draw (or that has no face to draw it). Page-content tools refuse such text; the Add-text editor
 /// keeps it open.
 pub fn first_undrawable(t: &AddedText) -> Option<char> {
+    if t.text.chars().any(is_khmer) {
+        if let Some(c) = t.text.chars().find(|c| is_khmer(*c) && !pdfkraft_fonts::khmer_has(*c)) {
+            return Some(c);
+        }
+        // The zero-width spaces between Khmer words are layout, never drawn.
+        let rest = AddedText { text: t.text.chars().filter(|c| !is_khmer(*c) && *c != '\u{200B}').collect(), ..t.clone() };
+        return first_undrawable(&rest);
+    }
     if t.text.chars().any(is_thai) {
         if let Some(c) = t.text.chars().find(|c| is_thai(*c) && !pdfkraft_fonts::thai_has(*c)) {
             return Some(c);
@@ -426,6 +473,12 @@ fn is_bidi_control(c: char) -> bool {
     matches!(c, '\u{061C}' | '\u{200E}' | '\u{200F}' | '\u{202A}'..='\u{202E}' | '\u{2066}'..='\u{2069}')
 }
 
+/// What a shaped line leaves out: the direction controls, and the zero-width space (U+200B) that
+/// marks word boundaries in Khmer (and Thai) text, which [`cluster_lines`] breaks at.
+fn is_ignorable(c: char) -> bool {
+    is_bidi_control(c) || c == '\u{200B}'
+}
+
 fn mirrored(c: char) -> char {
     match c {
         '(' => ')',
@@ -468,9 +521,11 @@ fn shaped_layout(t: &AddedText, line: &str, rtl: bool) -> Result<(Vec<Piece>, f6
         // (Hebrew's when they follow Hebrew), which the shaper then mirrors. Latin text (and what
         // the faces lack) keeps the item's font.
         let mut segments: Vec<(Option<ShapedScript>, String)> = Vec::new();
-        for c in text.chars().filter(|c| !is_bidi_control(*c)) {
+        for c in text.chars().filter(|c| !is_ignorable(*c)) {
             let after_hebrew = segments.last().is_some_and(|(kind, _)| *kind == Some(ShapedScript::Hebrew));
-            let script = if is_thai(c) {
+            let script = if is_khmer(c) {
+                Some(ShapedScript::Khmer { serif: t.family == Family::Times, bold: t.bold })
+            } else if is_thai(c) {
                 Some(ShapedScript::Thai)
             } else if is_hebrew(c) || (run_rtl && after_hebrew && !c.is_alphanumeric() && pdfkraft_fonts::hebrew_has(c)) {
                 Some(ShapedScript::Hebrew)
@@ -493,6 +548,7 @@ fn shaped_layout(t: &AddedText, line: &str, rtl: bool) -> Result<(Vec<Piece>, f6
                     ShapedScript::Arabic => shape_arabic(&s, run_rtl).map_err(|e| arabic_error(e, &s))?,
                     ShapedScript::Hebrew => shape_hebrew(&s, run_rtl).map_err(|e| hebrew_error(e, &s))?,
                     ShapedScript::Thai => shape_thai(&s).map_err(|e| thai_error(e, &s))?,
+                    ShapedScript::Khmer { serif, bold } => shape_khmer(&s, serif, bold).map_err(|e| khmer_error(e, &s))?,
                 };
                 Piece::Shaped(shaped)
             } else if run_rtl {
@@ -546,6 +602,15 @@ fn thai_error(e: GlyphError, text: &str) -> EditError {
         }
         GlyphError::Missing => format!("the Thai font can't show \"{text}\""),
         GlyphError::TooComplex => "the Thai glyphs are too complex; use a shorter text box".into(),
+    })
+}
+
+fn khmer_error(e: GlyphError, text: &str) -> EditError {
+    EditError::Invalid(match e {
+        // The Khmer faces are bundled, so this only happens if the build's copy is unreadable.
+        GlyphError::NoFont => "the bundled Khmer font could not be read".into(),
+        GlyphError::Missing => format!("the Khmer font can't show \"{text}\""),
+        GlyphError::TooComplex => "the Khmer glyphs are too complex; use a shorter text box".into(),
     })
 }
 
@@ -628,7 +693,7 @@ const GLYPHS_PER_FONT: usize = 240;
 /// its pieces in drawing order and its width at the item's size.
 type LaidLine = (String, bool, Vec<Piece>, f64);
 
-/// Draw a text item that has Arabic, Hebrew or Thai in it. Each line is laid out in display order; their glyphs
+/// Draw a text item that has Arabic, Hebrew, Thai or Khmer in it. Each line is laid out in display order; their glyphs
 /// come from Type 3 fonts drawn from the craft-fonts face's outlines (no font file is embedded),
 /// with a ToUnicode map for copy and search. Other text uses the item's standard font.
 fn draw_shaped(doc: &mut Document, t: &AddedText, taken: &Dict, fonts: &mut Dict, out: &mut Vec<u8>) -> Result<(), EditError> {
@@ -675,6 +740,7 @@ fn draw_laid_shaped(
                     ShapedScript::Arabic => arabic_error(e, &c.text),
                     ShapedScript::Hebrew => hebrew_error(e, &c.text),
                     ShapedScript::Thai => thai_error(e, &c.text),
+                    ShapedScript::Khmer { .. } => khmer_error(e, &c.text),
                 })?);
             }
         }
@@ -818,6 +884,7 @@ fn type3_shaped(doc: &mut Document, clusters: &[&ShapedCluster], outlines: &Hash
                 ShapedScript::Arabic => "Arabic",
                 ShapedScript::Hebrew => "Hebrew",
                 ShapedScript::Thai => "Thai",
+                ShapedScript::Khmer { .. } => "Khmer",
             },
             |f| f.family,
         ),
@@ -880,7 +947,7 @@ fn draw(doc: &mut Document, c: &Content, view: [f64; 6], taken: &Dict, existing:
             let mut fonts = Dict::new();
             fonts.set(name.clone().into_bytes(), Object::Dict(font));
             let face_or_new = |has: fn(char) -> bool, face: bool| t.text.chars().any(has) && (face || !existing);
-            if t.text.chars().any(is_thai)
+            if t.text.chars().any(|c| is_thai(c) || is_khmer(c))
                 || face_or_new(is_arabic, pdfkraft_fonts::document_arabic_font().is_some())
                 || face_or_new(is_hebrew, pdfkraft_fonts::document_hebrew_font(false).is_some())
             {
@@ -1133,8 +1200,12 @@ fn validate(c: &Content) -> Result<(), EditError> {
             // Everything else in it is drawn in the standard font, so it still has to fit.
             let undrawable = if t.text.chars().any(shaped_arabic) && pdfkraft_fonts::document_arabic_font().is_none() {
                 t.text.split('\n').find_map(|line| {
-                    line.chars()
-                        .find(|c| !(shaped_arabic(*c) || is_thai(*c) && pdfkraft_fonts::thai_has(*c) || pdfkraft_fonts::win_ansi_encodable(*c)))
+                    line.chars().find(|c| {
+                        !(shaped_arabic(*c)
+                            || is_thai(*c) && pdfkraft_fonts::thai_has(*c)
+                            || is_khmer(*c) && pdfkraft_fonts::khmer_has(*c)
+                            || pdfkraft_fonts::win_ansi_encodable(*c))
+                    })
                 })
             } else {
                 first_undrawable(t)

@@ -170,6 +170,57 @@ pub fn document_latin_fonts(bold: bool) -> Vec<&'static CraftFont> {
     vec![if bold { &INTER_SEMIBOLD_FACE } else { &INTER_REGULAR_FACE }]
 }
 
+/// The script the bundled Noto Khmer faces are for.
+static KHMER_SCRIPTS: &[&str] = &["Khmr"];
+
+/// The bundled Khmer document faces (`assets/fonts`, OFL 1.1): Noto Sans Khmer and Noto Serif
+/// Khmer, Regular and Bold. Every build has them, the web build included, so Khmer never depends
+/// on craft-fonts.
+static NOTO_SANS_KHMER_REGULAR: CraftFont = CraftFont {
+    family: "Noto Sans Khmer",
+    style: "Regular",
+    scripts: KHMER_SCRIPTS,
+    bytes: include_bytes!("../../../assets/fonts/NotoSansKhmer-Regular.ttf"),
+};
+static NOTO_SANS_KHMER_BOLD: CraftFont = CraftFont {
+    family: "Noto Sans Khmer",
+    style: "Bold",
+    scripts: KHMER_SCRIPTS,
+    bytes: include_bytes!("../../../assets/fonts/NotoSansKhmer-Bold.ttf"),
+};
+static NOTO_SERIF_KHMER_REGULAR: CraftFont = CraftFont {
+    family: "Noto Serif Khmer",
+    style: "Regular",
+    scripts: KHMER_SCRIPTS,
+    bytes: include_bytes!("../../../assets/fonts/NotoSerifKhmer-Regular.ttf"),
+};
+static NOTO_SERIF_KHMER_BOLD: CraftFont = CraftFont {
+    family: "Noto Serif Khmer",
+    style: "Bold",
+    scripts: KHMER_SCRIPTS,
+    bytes: include_bytes!("../../../assets/fonts/NotoSerifKhmer-Bold.ttf"),
+};
+
+/// The Khmer faces for the interface (file names, document titles, the text being typed into an
+/// Add text box): the bundled Noto Sans Khmer Regular, then any `Khmr` craft-fonts face. Never
+/// empty, unlike the other scripts' lists.
+pub fn ui_khmer_fonts() -> Vec<&'static CraftFont> {
+    let mut out = vec![&NOTO_SANS_KHMER_REGULAR];
+    out.extend(CRAFT_FONTS.iter().filter(|f| f.covers("Khmr")));
+    out
+}
+
+/// The face for Khmer text written into PDFs: Noto Serif Khmer for a serif (Times) item, else
+/// Noto Sans Khmer, and the Bold face when asked for. Bundled, so present in every build.
+pub fn document_khmer_font(serif: bool, bold: bool) -> &'static CraftFont {
+    match (serif, bold) {
+        (false, false) => &NOTO_SANS_KHMER_REGULAR,
+        (false, true) => &NOTO_SANS_KHMER_BOLD,
+        (true, false) => &NOTO_SERIF_KHMER_REGULAR,
+        (true, true) => &NOTO_SERIF_KHMER_BOLD,
+    }
+}
+
 fn document_face(faces: &[CraftFont], serif: bool, bold: bool) -> Option<&CraftFont> {
     document_faces(faces, serif, bold).into_iter().next()
 }
@@ -371,5 +422,32 @@ mod tests {
             assert_eq!(ui.first().map(|f| f.family), Some("BIZ UDPGothic"));
         }
         assert_eq!(document_japanese_font().map(|f| f.family), Some("Shippori Mincho"));
+    }
+}
+
+#[cfg(test)]
+mod khmer_tests {
+    use super::*;
+
+    /// The four bundled Khmer faces are distinct files, picked by family and weight, and the
+    /// interface always has one; this holds with or without CRAFT_FONTS_DIR.
+    #[test]
+    fn khmer_faces_are_bundled_and_picked_by_style() {
+        let regular = document_khmer_font(false, false);
+        let bold = document_khmer_font(false, true);
+        let serif = document_khmer_font(true, false);
+        let serif_bold = document_khmer_font(true, true);
+        assert_eq!((regular.family, regular.style), ("Noto Sans Khmer", "Regular"));
+        assert_eq!((bold.family, bold.style), ("Noto Sans Khmer", "Bold"));
+        assert_eq!((serif.family, serif.style), ("Noto Serif Khmer", "Regular"));
+        assert_eq!((serif_bold.family, serif_bold.style), ("Noto Serif Khmer", "Bold"));
+        let faces = [regular, bold, serif, serif_bold];
+        for (i, a) in faces.iter().enumerate() {
+            assert!(a.covers("Khmr") && !a.bytes.is_empty());
+            assert!(faces.iter().skip(i + 1).all(|b| !std::ptr::eq(a.bytes, b.bytes)), "{} twice", a.name());
+        }
+        let ui = ui_khmer_fonts();
+        assert_eq!(ui.first().map(|f| f.name()), Some("Noto Sans Khmer Regular".into()));
+        assert_eq!(ui.len(), 1 + CRAFT_FONTS.iter().filter(|f| f.covers("Khmr")).count());
     }
 }
