@@ -15,11 +15,11 @@ release: ${RELEASE}
 section: graphics
 priority: optional
 maintainer: ${PDFKRAFT_MAINTAINER}
-vendor: Learning Machines LLC
-homepage: https://getartcraft.com/apps/pdfkraft
+vendor: PDFKraft contributors
+homepage: https://github.com/kompheak7711/PDFKraft
 license: MIT OR Apache-2.0
 description: |-
-  Open-source, native PDF workbench: read, comment, fill and sign forms,
+  Open-source, native PDF workbench that types Khmer: read, comment, fill and sign forms,
   organize, combine, split, edit, redact, protect and export PDFs.
   Includes pdfkraft-cli, a headless command runner and opt-in MCP server.
 

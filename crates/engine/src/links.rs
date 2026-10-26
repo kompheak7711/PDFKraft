@@ -1,16 +1,17 @@
-//! Where PDFKraft and the ArtCraft community live on the web. One table, so the Help menu, the
-//! About dialog, the home screen, the CLI and the README agree.
+//! Where PDFKraft lives on the web. One table, so the Help menu, the About dialog, the home
+//! screen, the CLI and the README agree.
 
 use icu_properties::props::Script;
 use std::path::{Path, PathBuf};
 
-/// The app's name in ArtCraft URLs (`getartcraft.com/apps/{APP}`, `github.com/storytold/{APP}`).
-pub const APP: &str = "pdfkraft";
+/// The app's name in its URLs (`github.com/kompheak7711/{APP}`).
+pub const APP: &str = "PDFKraft";
 
-pub const DISCORD: &str = "https://discord.gg/artcraft";
-pub const WEBSITE: &str = "https://getartcraft.com";
-pub const APP_PAGE: &str = "https://getartcraft.com/apps/pdfkraft";
 pub const GITHUB: &str = "https://github.com/kompheak7711/PDFKraft";
+pub const ISSUES: &str = "https://github.com/kompheak7711/PDFKraft/issues";
+pub const RELEASES: &str = "https://github.com/kompheak7711/PDFKraft/releases";
+/// The project PDFKraft is a fork of (MIT OR Apache-2.0), credited in the About dialog.
+pub const UPSTREAM: &str = "https://github.com/storytold/pdfcraft";
 
 /// A link and the registry command that opens it.
 #[derive(Clone, Copy, Debug)]
@@ -22,12 +23,12 @@ pub struct Link {
     pub icon: &'static str,
 }
 
-/// In the order they are shown. Discord comes first: it is where people get help fastest.
+/// In the order they are shown. GitHub comes first: issues, downloads and the source live there.
 pub const LINKS: &[Link] = &[
-    Link { command: "help.discord", label: "Join the ArtCraft Discord", url: DISCORD, icon: "messages-square" },
-    Link { command: "help.app_page", label: "PDFKraft web page", url: APP_PAGE, icon: "globe" },
     Link { command: "help.github", label: "PDFKraft on GitHub", url: GITHUB, icon: "code-xml" },
-    Link { command: "help.website", label: "ArtCraft website", url: WEBSITE, icon: "external-link" },
+    Link { command: "help.issues", label: "Report a problem", url: ISSUES, icon: "circle-help" },
+    Link { command: "help.releases", label: "Downloads", url: RELEASES, icon: "globe" },
+    Link { command: "help.upstream", label: "Based on PdfCraft", url: UPSTREAM, icon: "external-link" },
 ];
 
 pub fn for_command(id: &str) -> Option<&'static Link> {

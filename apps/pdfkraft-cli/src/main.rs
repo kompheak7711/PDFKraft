@@ -176,9 +176,9 @@ fn stdout_line(line: std::fmt::Arguments<'_>) -> Result<(), CliError> {
 
 fn version() -> Result<(), CliError> {
     stdout_line(format_args!("pdfkraft-cli {}", pdfkraft_engine::build_info::version()))?;
-    stdout_line(format_args!("Discord: {}  (help and feedback)", pdfkraft_engine::links::DISCORD))?;
-    stdout_line(format_args!("Web:     {}", pdfkraft_engine::links::APP_PAGE))?;
     stdout_line(format_args!("Source:  {}", pdfkraft_engine::links::GITHUB))?;
+    stdout_line(format_args!("Issues:  {}  (help and feedback)", pdfkraft_engine::links::ISSUES))?;
+    stdout_line(format_args!("Based on PdfCraft: {}", pdfkraft_engine::links::UPSTREAM))?;
     Ok(())
 }
 

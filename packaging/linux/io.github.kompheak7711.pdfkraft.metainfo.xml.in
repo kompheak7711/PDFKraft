@@ -7,22 +7,23 @@
   <project_license>MIT OR Apache-2.0</project_license>
   <name>PDFKraft</name>
   <summary>Read, organize, combine, split and secure PDFs</summary>
-  <developer id="ai.storyteller">
-    <name>Learning Machines LLC</name>
+  <developer id="io.github.kompheak7711">
+    <name>PDFKraft contributors</name>
   </developer>
   <description>
     <p>
-      PDFKraft is an open-source PDF workbench. Read, comment on, fill in and sign PDFs;
-      organize, combine and split pages; edit, redact, protect and export documents.
+      PDFKraft is an open-source PDF workbench that types Khmer Unicode. Read, comment on, fill in
+      and sign PDFs; add Khmer and Latin text with the bundled Noto Khmer fonts; organize, combine
+      and split pages; edit, redact, protect and export documents. Based on PdfCraft.
     </p>
   </description>
   <launchable type="desktop-id">io.github.kompheak7711.pdfkraft.desktop</launchable>
   <icon type="stock">io.github.kompheak7711.pdfkraft</icon>
   <!-- Only url types known to appstream 0.15 (Ubuntu 22.04, where CI validates): no vcs-browser. -->
-  <url type="homepage">https://getartcraft.com/apps/pdfkraft</url>
+  <url type="homepage">https://github.com/kompheak7711/PDFKraft</url>
   <url type="bugtracker">https://github.com/kompheak7711/PDFKraft/issues</url>
   <url type="help">https://github.com/kompheak7711/PDFKraft</url>
-  <url type="contact">https://discord.gg/artcraft</url>
+  <url type="contact">https://github.com/kompheak7711/PDFKraft/issues</url>
   <categories>
     <category>Office</category>
     <category>Viewer</category>
@@ -33,12 +34,6 @@
     <keyword>annotate</keyword>
     <keyword>forms</keyword>
   </keywords>
-  <screenshots>
-    <screenshot type="default">
-      <caption>A PDF open with its threaded comments</caption>
-      <image>https://raw.githubusercontent.com/kompheak7711/PDFKraft/main/docs/images/pdfkraft-viewer.png</image>
-    </screenshot>
-  </screenshots>
   <branding>
     <color type="primary" scheme_preference="light">#9fd0ff</color>
     <color type="primary" scheme_preference="dark">#1f64ba</color>
