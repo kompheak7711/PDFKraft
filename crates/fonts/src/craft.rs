@@ -273,12 +273,6 @@ pub fn khmer_family_is_serif(family: &str) -> bool {
     family.contains("Serif")
 }
 
-/// Whether a bundled Khmer family is a serif face, so Latin text beside it takes Times rather
-/// than Helvetica when the family is picked from the one font list.
-pub fn khmer_family_is_serif(family: &str) -> bool {
-    family.contains("Serif")
-}
-
 /// The index into [`KHMER_FACES`] used when the item names no Khmer family: Noto Serif Khmer
 /// for a serif (Times) item, else Noto Sans Khmer, Bold when asked for.
 pub fn default_khmer_face(serif: bool, bold: bool) -> usize {
