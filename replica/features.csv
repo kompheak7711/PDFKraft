@@ -1,0 +1,27 @@
+feature,area,priority,original,clone,notes
+Open and render PDFs (scripts; tiles; damaged files),viewer,must,yes,yes,same code as upstream
+Continuous / single / two-up / read mode / dark theme,viewer,must,yes,yes,same code as upstream
+Search; text selection in reading order,viewer,must,yes,yes,same code as upstream
+Bookmarks; thumbnails; page labels,viewer,should,yes,yes,same code as upstream
+Organize pages (move; rotate; delete; insert),organize,must,yes,yes,same code as upstream
+Combine and split documents,organize,must,yes,yes,same code as upstream
+Open protected documents; set permissions,security,must,yes,yes,same code as upstream
+Comments and threaded replies,annotate,should,yes,yes,same code as upstream
+Forms (fill; create fields),forms,should,yes,yes,same code as upstream
+Layers and attachments,viewer,could,yes,yes,same code as upstream
+Add text as page content (Latin; WinAnsi),edit,must,yes,yes,same code as upstream
+Add text: Arabic / Hebrew / Thai (with craft-fonts),edit,should,yes,yes,same optional input as upstream
+Add text: Khmer Unicode with proper shaping,edit,must,no,yes,new: harfrust Khmer shaper; Type 3 glyphs with ToUnicode and ActualText
+Khmer fonts bundled in the application,edit,must,no,yes,new: Noto Sans Khmer and Noto Serif Khmer; Regular and Bold; every build
+Khmer sans/serif and bold follow the item's family and weight,edit,should,no,yes,new
+Khmer word wrapping at zero-width spaces,edit,should,no,yes,new; glyph-safe; not dictionary-based
+Khmer shown in the interface (titles; file names; the text box),edit,must,no,yes,new: Noto Sans Khmer in the font stack
+Khmer in comments; form fields; typed signatures,annotate,could,no,no,still standard fonts; out of scope for this release
+Use a Khmer font installed on the computer to write into a PDF,edit,could,no,no,bundled faces only; installed fonts remain the interface fallback for scripts without a bundled face
+Headless tools (pdfkraft-cli run) and MCP server,agents,should,yes,yes,same code as upstream; Khmer covered by the automation test
+Redact; export; print; OCR,pro,should,yes,yes,same code as upstream
+Own name; app id; icon; links,brand,must,yes,yes,PDFKraft; io.github.kompheak7711.pdfkraft; generated mark; GitHub links
+ArtCraft wordmark and logos,brand,could,yes,skip,trademarks: forks must remove them
+ArtCraft Discord and web pages,brand,could,yes,skip,the upstream community; not a feature
+Signed and notarized installers,release,could,yes,skip,needs the signing accounts the release workflow expects
+Native macOS menu bar from craft-menu (upstream commit 64e0868b),viewer,could,yes,no,that commit's pinned craft-libs revision does not build with Cargo 1.97; the fork starts at its parent
