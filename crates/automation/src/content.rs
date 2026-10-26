@@ -67,6 +67,19 @@ fn style(a: &Args, t: &mut AddedText) -> Result<()> {
         }
         t.char_spacing = c;
     }
+    if let Some(f) = a.opt_str("khmer_font")? {
+        let families = pdfkraft_fonts::khmer_families();
+        t.khmer_font = match f {
+            "" | "default" => None,
+            name => Some(
+                families
+                    .iter()
+                    .find(|k| k.eq_ignore_ascii_case(name))
+                    .map(|k| (*k).to_string())
+                    .ok_or_else(|| bad(format!("unknown khmer_font {name:?} (one of {})", families.join(", "))))?,
+            ),
+        };
+    }
     Ok(())
 }
 
@@ -92,6 +105,9 @@ impl Automation {
                         v["bold"] = json!(t.bold);
                         v["italic"] = json!(t.italic);
                         v["char_spacing"] = json!(t.char_spacing);
+                        if let Some(f) = &t.khmer_font {
+                            v["khmer_font"] = json!(f);
+                        }
                     }
                     AddedContent::Image(_) => v["type"] = json!("image"),
                 }

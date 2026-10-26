@@ -626,6 +626,27 @@ fn added_text_format(ui: &mut egui::Ui, t: &Tokens, style: &mut pdfkraft_engine:
     if let Some(crate::format_text_ui::FontChoice::Family(family)) = out.font {
         style.family = family;
     }
+    // The face for Khmer letters: one of the bundled families, or the one that follows the family.
+    ui.add_space(4.0);
+    let shown = match &style.khmer_font {
+        Some(f) => egui::WidgetText::from(f.as_str()),
+        None => tl!("Khmer: follow the font").into(),
+    };
+    egui::ComboBox::from_id_salt("format-khmer-font")
+        .selected_text(shown)
+        .width(ui.available_width())
+        .show_ui(ui, |ui| {
+            if ui.selectable_label(style.khmer_font.is_none(), tl!("Khmer: follow the font")).clicked() {
+                style.khmer_font = None;
+            }
+            for family in pdfkraft_fonts::khmer_families() {
+                if ui.selectable_label(style.khmer_font.as_deref() == Some(family), family).clicked() {
+                    style.khmer_font = Some(family.to_string());
+                }
+            }
+        })
+        .response
+        .on_hover_text(tl!("The face for Khmer letters. Following the font means Noto Sans Khmer, or Noto Serif Khmer for Times."));
 }
 
 impl PDFKraftApp {

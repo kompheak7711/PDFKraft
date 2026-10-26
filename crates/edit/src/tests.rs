@@ -7526,6 +7526,29 @@ fn added_khmer_text_is_shaped_wraps_at_word_marks_and_survives_reopen() {
     let names: Vec<String> =
         fonts.iter().filter(|(k, _)| k.starts_with(b"PCAr")).filter_map(|(_, v)| font_name(&doc, doc.resolve(v).as_dict().unwrap())).collect();
     assert!(names.iter().any(|n| n == "NotoSerifKhmer"), "{names:?}");
+    // A chosen Khmer family wins over the item's family, is saved with the item and comes back.
+    let muol = AddedText { khmer_font: Some("Khmer OS Muol".into()), rect: [20.0, 450.0, 250.0, 470.0], text: "មូល".into(), ..t.clone() };
+    add_content(&mut doc, 0, &Content::Text(muol.clone())).unwrap();
+    let reopened = reopen(&doc);
+    let items = list_added(&reopened);
+    let Content::Text(back) = &items[2].content else { panic!("{items:?}") };
+    assert_eq!(back.khmer_font.as_deref(), Some("Khmer OS Muol"));
+    let p = &pdfkraft_model::pages(&reopened)[0];
+    let res = reopened.resolve(p.dict.get(b"Resources").unwrap());
+    let fonts = reopened.resolve(res.as_dict().unwrap().get(b"Font").unwrap()).as_dict().unwrap().clone();
+    let names: Vec<String> = fonts
+        .iter()
+        .filter(|(k, _)| k.starts_with(b"PCAr"))
+        .filter_map(|(_, v)| font_name(&reopened, reopened.resolve(v).as_dict().unwrap()))
+        .collect();
+    assert!(names.iter().any(|n| n == "KhmerOSMuol"), "{names:?}");
+    // A family this build does not bundle falls back to the item's family, without an error.
+    let unknown =
+        AddedText { khmer_font: Some("Khmer Nowhere".into()), rect: [20.0, 420.0, 250.0, 440.0], text: "ខ្មែរ".into(), ..t.clone() };
+    assert_eq!(first_undrawable(&unknown), None);
+    add_content(&mut doc, 0, &Content::Text(unknown)).unwrap();
+    delete_content(&mut doc, 0, 3).unwrap();
+    delete_content(&mut doc, 0, 2).unwrap();
     // What the face lacks is refused before anything is written.
     let bad = Content::Text(AddedText { text: "ខ្មែរ 日".into(), ..t });
     let before = list_added(&doc);

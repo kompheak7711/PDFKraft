@@ -122,6 +122,10 @@ pub struct AddedText {
     pub align: Align,
     /// Extra space after every character, in points: the PDF's character spacing (`Tc`).
     pub char_spacing: f64,
+    /// The bundled Khmer family (`pdfkraft_fonts::khmer_families`) for the item's Khmer letters;
+    /// `None` follows the item's family (Noto Serif Khmer for Times, else Noto Sans Khmer). A name
+    /// this build does not bundle is kept and falls back the same way.
+    pub khmer_font: Option<String>,
 }
 
 impl Default for AddedText {
@@ -136,6 +140,7 @@ impl Default for AddedText {
             color: [0.0; 3],
             align: Align::Left,
             char_spacing: 0.0,
+            khmer_font: None,
         }
     }
 }
@@ -403,6 +408,19 @@ fn is_khmer(c: char) -> bool {
     matches!(u32::from(c), 0x1780..=0x17FF | 0x19E0..=0x19FF)
 }
 
+/// The bundled Khmer face (an index into `pdfkraft_fonts::KHMER_FACES`) for the item: the family
+/// it names, at its weight, else the default for its family and weight.
+fn khmer_face(t: &AddedText) -> u8 {
+    let index = t
+        .khmer_font
+        .as_deref()
+        .and_then(|family| pdfkraft_fonts::khmer_face_for(family, t.bold))
+        .unwrap_or_else(|| pdfkraft_fonts::default_khmer_face(t.family == Family::Times, t.bold));
+    // The table is far shorter than 256 faces; a wider index could only come from a bug, and the
+    // first face is a safe stand-in.
+    u8::try_from(index).unwrap_or(0)
+}
+
 /// Arabic letters, marks, digits and punctuation: an item with any of them is shaped with the
 /// craft-fonts Arabic face.
 fn is_arabic(c: char) -> bool {
@@ -421,7 +439,7 @@ fn is_hebrew(c: char) -> bool {
 /// keeps it open.
 pub fn first_undrawable(t: &AddedText) -> Option<char> {
     if t.text.chars().any(is_khmer) {
-        if let Some(c) = t.text.chars().find(|c| is_khmer(*c) && !pdfkraft_fonts::khmer_has(*c)) {
+        if let Some(c) = t.text.chars().find(|c| is_khmer(*c) && !pdfkraft_fonts::khmer_has(*c, khmer_face(t))) {
             return Some(c);
         }
         // The zero-width spaces between Khmer words are layout, never drawn.
@@ -524,7 +542,7 @@ fn shaped_layout(t: &AddedText, line: &str, rtl: bool) -> Result<(Vec<Piece>, f6
         for c in text.chars().filter(|c| !is_ignorable(*c)) {
             let after_hebrew = segments.last().is_some_and(|(kind, _)| *kind == Some(ShapedScript::Hebrew));
             let script = if is_khmer(c) {
-                Some(ShapedScript::Khmer { serif: t.family == Family::Times, bold: t.bold })
+                Some(ShapedScript::Khmer { face: khmer_face(t) })
             } else if is_thai(c) {
                 Some(ShapedScript::Thai)
             } else if is_hebrew(c) || (run_rtl && after_hebrew && !c.is_alphanumeric() && pdfkraft_fonts::hebrew_has(c)) {
@@ -548,7 +566,7 @@ fn shaped_layout(t: &AddedText, line: &str, rtl: bool) -> Result<(Vec<Piece>, f6
                     ShapedScript::Arabic => shape_arabic(&s, run_rtl).map_err(|e| arabic_error(e, &s))?,
                     ShapedScript::Hebrew => shape_hebrew(&s, run_rtl).map_err(|e| hebrew_error(e, &s))?,
                     ShapedScript::Thai => shape_thai(&s).map_err(|e| thai_error(e, &s))?,
-                    ShapedScript::Khmer { serif, bold } => shape_khmer(&s, serif, bold).map_err(|e| khmer_error(e, &s))?,
+                    ShapedScript::Khmer { face } => shape_khmer(&s, face).map_err(|e| khmer_error(e, &s))?,
                 };
                 Piece::Shaped(shaped)
             } else if run_rtl {
@@ -1039,6 +1057,9 @@ fn params(c: &Content) -> Dict {
             if t.char_spacing != 0.0 {
                 d.set(b"CharSpacing".to_vec(), Object::Real(t.char_spacing));
             }
+            if let Some(family) = &t.khmer_font {
+                d.set(b"KhmerFont".to_vec(), PdfString::text(family));
+            }
         }
         Content::Image(i) => {
             d.set(b"Kind".to_vec(), Object::name("Image"));
@@ -1084,6 +1105,8 @@ fn parse(doc: &Document, d: &Dict) -> Option<Content> {
                 },
                 // Items written before character spacing have none.
                 char_spacing: d.get(b"CharSpacing").and_then(Object::as_f64).filter(|v| v.is_finite()).unwrap_or(0.0),
+                // Items written before the Khmer font list follow their family.
+                khmer_font: d.get(b"KhmerFont").and_then(|f| doc.resolve(f).as_string().map(|s| s.to_text())).filter(|s| !s.is_empty()),
             }))
         }
         b"Image" => {
@@ -1203,7 +1226,7 @@ fn validate(c: &Content) -> Result<(), EditError> {
                     line.chars().find(|c| {
                         !(shaped_arabic(*c)
                             || is_thai(*c) && pdfkraft_fonts::thai_has(*c)
-                            || is_khmer(*c) && pdfkraft_fonts::khmer_has(*c)
+                            || is_khmer(*c) && pdfkraft_fonts::khmer_has(*c, khmer_face(t))
                             || pdfkraft_fonts::win_ansi_encodable(*c))
                     })
                 })

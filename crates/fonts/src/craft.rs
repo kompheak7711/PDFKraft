@@ -201,6 +201,83 @@ static NOTO_SERIF_KHMER_BOLD: CraftFont = CraftFont {
     bytes: include_bytes!("../../../assets/fonts/NotoSerifKhmer-Bold.ttf"),
 };
 
+static KHMER_OS_BATTAMBANG: CraftFont = CraftFont {
+    family: "Khmer OS Battambang",
+    style: "Regular",
+    scripts: KHMER_SCRIPTS,
+    bytes: include_bytes!("../../../assets/fonts/KhmerOS-Battambang.ttf"),
+};
+static KHMER_OS_MUOL: CraftFont =
+    CraftFont { family: "Khmer OS Muol", style: "Regular", scripts: KHMER_SCRIPTS, bytes: include_bytes!("../../../assets/fonts/KhmerOS-Muol.ttf") };
+static KHMER_OS_SIEMREAP: CraftFont = CraftFont {
+    family: "Khmer OS Siemreap",
+    style: "Regular",
+    scripts: KHMER_SCRIPTS,
+    bytes: include_bytes!("../../../assets/fonts/KhmerOS-Siemreap.ttf"),
+};
+static KHMER_M1: CraftFont =
+    CraftFont { family: "Khmer M1", style: "Regular", scripts: KHMER_SCRIPTS, bytes: include_bytes!("../../../assets/fonts/KhmerM1.ttf") };
+static KHMER_M2: CraftFont =
+    CraftFont { family: "Khmer M2", style: "Regular", scripts: KHMER_SCRIPTS, bytes: include_bytes!("../../../assets/fonts/KhmerM2.ttf") };
+static KHMER_S1: CraftFont =
+    CraftFont { family: "Khmer S1", style: "Regular", scripts: KHMER_SCRIPTS, bytes: include_bytes!("../../../assets/fonts/KhmerS1.ttf") };
+static KHMER_S2: CraftFont =
+    CraftFont { family: "Khmer S2", style: "Regular", scripts: KHMER_SCRIPTS, bytes: include_bytes!("../../../assets/fonts/KhmerS2.ttf") };
+
+/// Every bundled Khmer face, in the order the Khmer font list shows their families. An item
+/// names its face by family (`AddedText::khmer_font`) and the shaper by index into this table
+/// (`ShapedScript::Khmer { face }`), so the order is part of a build, never of a saved file.
+pub static KHMER_FACES: &[&CraftFont] = &[
+    &NOTO_SANS_KHMER_REGULAR,
+    &NOTO_SANS_KHMER_BOLD,
+    &NOTO_SERIF_KHMER_REGULAR,
+    &NOTO_SERIF_KHMER_BOLD,
+    &KHMER_OS_BATTAMBANG,
+    &KHMER_OS_MUOL,
+    &KHMER_OS_SIEMREAP,
+    &KHMER_M1,
+    &KHMER_M2,
+    &KHMER_S1,
+    &KHMER_S2,
+];
+
+/// `KHMER_FACES.len()`, for the shaper's per-face caches (checked by a test).
+pub const KHMER_FACE_COUNT: usize = 11;
+
+/// The bundled Khmer face at `index` of [`KHMER_FACES`], if there is one.
+pub fn khmer_face(index: usize) -> Option<&'static CraftFont> {
+    KHMER_FACES.get(index).copied()
+}
+
+/// The families a user can pick for Khmer text, each once, in [`KHMER_FACES`] order.
+pub fn khmer_families() -> Vec<&'static str> {
+    let mut out: Vec<&'static str> = Vec::new();
+    for f in KHMER_FACES {
+        if !out.contains(&f.family) {
+            out.push(f.family);
+        }
+    }
+    out
+}
+
+/// The index into [`KHMER_FACES`] of `family`'s face for the weight: its Bold face when `bold`
+/// and it has one, else its Regular, else its first. `None` for a family that is not bundled.
+pub fn khmer_face_for(family: &str, bold: bool) -> Option<usize> {
+    let of = |style: &str| KHMER_FACES.iter().position(|f| f.family == family && f.style == style);
+    bold.then(|| of("Bold")).flatten().or_else(|| of("Regular")).or_else(|| KHMER_FACES.iter().position(|f| f.family == family))
+}
+
+/// The index into [`KHMER_FACES`] used when the item names no Khmer family: Noto Serif Khmer
+/// for a serif (Times) item, else Noto Sans Khmer, Bold when asked for.
+pub fn default_khmer_face(serif: bool, bold: bool) -> usize {
+    match (serif, bold) {
+        (false, false) => 0,
+        (false, true) => 1,
+        (true, false) => 2,
+        (true, true) => 3,
+    }
+}
+
 /// The Khmer faces for the interface (file names, document titles, the text being typed into an
 /// Add text box): the bundled Noto Sans Khmer Regular, then any `Khmr` craft-fonts face. Never
 /// empty, unlike the other scripts' lists.
@@ -210,8 +287,8 @@ pub fn ui_khmer_fonts() -> Vec<&'static CraftFont> {
     out
 }
 
-/// The face for Khmer text written into PDFs: Noto Serif Khmer for a serif (Times) item, else
-/// Noto Sans Khmer, and the Bold face when asked for. Bundled, so present in every build.
+/// The face for Khmer text written into PDFs when the item names no family: Noto Serif Khmer
+/// for a serif (Times) item, else Noto Sans Khmer, and the Bold face when asked for.
 pub fn document_khmer_font(serif: bool, bold: bool) -> &'static CraftFont {
     match (serif, bold) {
         (false, false) => &NOTO_SANS_KHMER_REGULAR,
@@ -449,5 +526,42 @@ mod khmer_tests {
         let ui = ui_khmer_fonts();
         assert_eq!(ui.first().map(|f| f.name()), Some("Noto Sans Khmer Regular".into()));
         assert_eq!(ui.len(), 1 + CRAFT_FONTS.iter().filter(|f| f.covers("Khmr")).count());
+    }
+
+    /// The Khmer font list: every bundled face once, families in order, the weight resolved per
+    /// family, and the defaults pointing at the Noto faces.
+    #[test]
+    fn khmer_font_list_resolves_families_and_weights() {
+        assert_eq!(KHMER_FACES.len(), KHMER_FACE_COUNT);
+        assert!(KHMER_FACES.iter().all(|f| f.covers("Khmr") && !f.bytes.is_empty()));
+        for (i, a) in KHMER_FACES.iter().enumerate() {
+            assert!(KHMER_FACES.iter().skip(i + 1).all(|b| !std::ptr::eq(a.bytes, b.bytes)), "{} twice", a.name());
+        }
+        assert_eq!(
+            khmer_families(),
+            [
+                "Noto Sans Khmer",
+                "Noto Serif Khmer",
+                "Khmer OS Battambang",
+                "Khmer OS Muol",
+                "Khmer OS Siemreap",
+                "Khmer M1",
+                "Khmer M2",
+                "Khmer S1",
+                "Khmer S2"
+            ]
+        );
+        assert_eq!(khmer_face_for("Noto Sans Khmer", false), Some(0));
+        assert_eq!(khmer_face_for("Noto Sans Khmer", true), Some(1));
+        assert_eq!(khmer_face_for("Noto Serif Khmer", true), Some(3));
+        // A family with one weight serves bold text with it.
+        assert_eq!(khmer_face_for("Khmer OS Muol", true), khmer_face_for("Khmer OS Muol", false));
+        assert_eq!(khmer_face(khmer_face_for("Khmer OS Muol", true).unwrap()).map(|f| f.family), Some("Khmer OS Muol"));
+        assert_eq!(khmer_face_for("Khmer Nowhere", false), None);
+        assert!(khmer_face(KHMER_FACE_COUNT).is_none());
+        for (serif, bold) in [(false, false), (false, true), (true, false), (true, true)] {
+            let i = default_khmer_face(serif, bold);
+            assert!(std::ptr::eq(khmer_face(i).unwrap(), document_khmer_font(serif, bold)));
+        }
     }
 }

@@ -34,10 +34,14 @@ source-level evidence is in
   under their consonant, pre-base vowels such as ែ and ើ come out before it, and marks sit where
   the font puts them. Each grapheme becomes one glyph of a Type 3 font with a ToUnicode map, and
   every line carries ActualText, so the Khmer stays searchable and copyable in other readers.
-- **Khmer fonts in the app.** Noto Sans Khmer and Noto Serif Khmer (Regular and Bold, SIL Open
-  Font License) are committed under `assets/fonts/` and embedded in every build, the web build
-  included. Items in the Helvetica or Courier family use the sans face, Times items the serif
-  face, and bold text the Bold face. No download, no optional build input, no system font.
+- **Khmer fonts in the app.** Nine Khmer families are committed under `assets/fonts/` and
+  embedded in every build, the web build included: Noto Sans Khmer and Noto Serif Khmer (Regular
+  and Bold, SIL Open Font License), Khmer OS Battambang, Khmer OS Muol and Khmer OS Siemreap
+  (Danh Hong, LGPL 2.1 or later), and Khmer M1, Khmer M2, Khmer S1 and Khmer S2 (LIM
+  Sovanvichet, LGPL 2.1 or later). The format panel's **Khmer font** list picks one per text
+  box; left on "follow the font", Helvetica and Courier items use Noto Sans Khmer, Times items
+  Noto Serif Khmer, and bold text the Bold face. No download, no optional build input, no
+  system font.
 - **Khmer on screen.** Noto Sans Khmer is in the interface font stack, so file names, document
   titles and the text you are typing into an Add text box show in Khmer.
 - **Khmer word wrapping.** Khmer has no spaces between words. Lines break at a zero-width space
@@ -58,8 +62,11 @@ and the MCP server, is PdfCraft's work, unchanged.
 3. Click where the text should start. Switch your keyboard to Khmer (NiDA, Khmer Unicode or the
    layout your system ships) and type. Type a space or a zero-width space between words if you
    want lines to break there.
-4. Pick the family, size, colour and bold in the format panel. Helvetica and Courier items are
-   written in Noto Sans Khmer, Times items in Noto Serif Khmer.
+4. Pick the family, size, colour and bold in the format panel, and the **Khmer font** (Noto
+   Sans or Serif Khmer, Khmer OS Battambang, Muol or Siemreap, Khmer M1, M2, S1 or S2). Left
+   on "follow the font", Helvetica and Courier items are written in Noto Sans Khmer and Times
+   items in Noto Serif Khmer. The choice is saved with the text box and comes back when you
+   reopen the file.
 5. Click **Done** (or click elsewhere on the page). The page redraws with the shaped text.
 
 Mixed text works: Khmer, Latin, Thai, Arabic and Hebrew can share one text box, each in its own
@@ -103,7 +110,7 @@ For example, this script adds Khmer text to the first page and saves a copy:
 ```json
 [
   {"tool": "doc_open", "args": {"path": "in.pdf"}},
-  {"tool": "page_add_text", "args": {"doc": 1, "page": 1, "text": "ភាសាខ្មែរ", "at": [72, 72], "size": 14}},
+  {"tool": "page_add_text", "args": {"doc": 1, "page": 1, "text": "ភាសាខ្មែរ", "at": [72, 72], "size": 14, "khmer_font": "Khmer OS Muol"}},
   {"tool": "doc_save", "args": {"doc": 1, "path": "out.pdf"}}
 ]
 ```
@@ -118,11 +125,21 @@ CRAFT_FONTS_DIR=$PWD/../craft-fonts cargo run --release -p pdfkraft -- some.pdf
 ```
 
 The web build is `trunk build --release` in `apps/pdfkraft-web` (see
-[packaging/web/README.md](packaging/web/README.md)). Installers for macOS, Windows, Linux and
-FreeBSD come from the release workflow in `.github/workflows/release.yml`, run from the Actions
-tab or by pushing a version tag. It inherits PdfCraft's signing and notarization steps, which
-expect the Apple and Windows signing secrets; without them, build locally with the scripts in
-`packaging/`.
+[packaging/web/README.md](packaging/web/README.md)).
+
+**Ready-made apps for macOS, Windows and Linux** come from the **Build apps** workflow
+(`.github/workflows/build.yml`): open the repository's Actions tab, choose "Build apps", click
+"Run workflow" on the branch you want, and wait. It builds a universal macOS `.dmg`, a Windows
+`.msi` and portable `.zip`, and a Linux AppImage, `.deb`, `.rpm` and tarball, then attaches
+them to a pre-release named `build-<run number>` under Releases. These builds are not signed or
+notarized, so the first launch needs one extra step:
+
+- macOS: Gatekeeper says the app cannot be opened; click Done, then System Settings ▸ Privacy &
+  Security ▸ Open Anyway, or run `xattr -dr com.apple.quarantine /Applications/PDFKraft.app`.
+- Windows: SmartScreen says "Windows protected your PC"; click More info ▸ Run anyway.
+
+`.github/workflows/release.yml` is PdfCraft's signed release pipeline, kept for the day the
+Apple and Windows signing accounts exist.
 
 ## Development
 
@@ -149,4 +166,7 @@ PDFKraft is licensed under either the MIT License or the Apache License 2.0, at 
 (`LICENSE-MIT`, `LICENSE-APACHE`), like PdfCraft, whose copyright notices it keeps (`NOTICE`).
 Third-party material is listed per file in `ATTRIBUTION.md`. The Khmer typefaces are Noto Sans
 Khmer and Noto Serif Khmer, Copyright 2022 The Noto Project Authors, under the SIL Open Font
-License 1.1 (`assets/fonts/OFL-NotoKhmer.txt`).
+License 1.1 (`assets/fonts/OFL-NotoKhmer.txt`); the Khmer OS faces (Copyright 2007 Danh Hong) and the
+Khmer M and S faces (Copyright 2007 LIM Sovanvichet) are under the GNU Lesser General Public
+License 2.1 or later (`assets/fonts/LGPL-2.1.txt`), the one copyleft exception in the asset
+policy (`AGENTS.md` §1.2), made for fonts the project owner supplies.

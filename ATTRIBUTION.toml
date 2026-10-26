@@ -2261,6 +2261,83 @@ usage = "Khmer document face for Add text (shaped with harfrust, drawn as Type 3
 sha256 = "234ef321f19d4d4e3c34cbaffdf97b1bb6db426615c6427c27b5aba4d43f6162"
 
 [[asset]]
+path = "assets/fonts/KhmerOS-Battambang.ttf"
+title = "Khmer OS Battambang"
+author = "Danh Hong"
+source = "Khmer OS project (http://www.khmeros.info), version 1.10 2007, as the project owner supplied it; copyright and licence from the font's name table"
+licence = "LGPL-2.1-or-later"
+licence_file = "assets/fonts/LGPL-2.1.txt"
+kind = "font"
+usage = "A Khmer face the user can pick for Add text (the Khmer font list); shaped with harfrust and drawn as Type 3 outlines with ToUnicode"
+sha256 = "4d86384ad187568003ccb7d53ff81478c9ed5a55fc630a6a03e27bd12acc971d"
+
+[[asset]]
+path = "assets/fonts/KhmerOS-Muol.ttf"
+title = "Khmer OS Muol"
+author = "Danh Hong"
+source = "Khmer OS project (http://www.khmeros.info), version 4.10 2007, as the project owner supplied it; copyright and licence from the font's name table"
+licence = "LGPL-2.1-or-later"
+licence_file = "assets/fonts/LGPL-2.1.txt"
+kind = "font"
+usage = "A Khmer face the user can pick for Add text (the Khmer font list); shaped with harfrust and drawn as Type 3 outlines with ToUnicode"
+sha256 = "546ee4ae0bfbcc57ad692ffad27cd4e2202d87e9d515a7a31ec5cf83923cc37b"
+
+[[asset]]
+path = "assets/fonts/KhmerOS-Siemreap.ttf"
+title = "Khmer OS Siemreap"
+author = "Danh Hong"
+source = "Khmer OS project (http://www.khmeros.info), version 1.00 2007, as the project owner supplied it; copyright and licence from the font's name table"
+licence = "LGPL-2.1-or-later"
+licence_file = "assets/fonts/LGPL-2.1.txt"
+kind = "font"
+usage = "A Khmer face the user can pick for Add text (the Khmer font list); shaped with harfrust and drawn as Type 3 outlines with ToUnicode"
+sha256 = "07f9ee9f596b7e297221cb134b20ec4e9f1e961a1a0f573ce418f0039cf5fdc6"
+
+[[asset]]
+path = "assets/fonts/KhmerM1.ttf"
+title = "Khmer M1"
+author = "LIM Sovanvichet"
+source = "Version 1.0 2007, as the project owner supplied it; copyright and licence from the font's name table"
+licence = "LGPL-2.1-or-later"
+licence_file = "assets/fonts/LGPL-2.1.txt"
+kind = "font"
+usage = "A Khmer face the user can pick for Add text (the Khmer font list); shaped with harfrust and drawn as Type 3 outlines with ToUnicode"
+sha256 = "e6f1c27c4abb67a241438fd7e845f7219590eb5b510fe27b8efdf4232acb941a"
+
+[[asset]]
+path = "assets/fonts/KhmerM2.ttf"
+title = "Khmer M2"
+author = "LIM Sovanvichet"
+source = "Version 1.0 2007, as the project owner supplied it; copyright and licence from the font's name table"
+licence = "LGPL-2.1-or-later"
+licence_file = "assets/fonts/LGPL-2.1.txt"
+kind = "font"
+usage = "A Khmer face the user can pick for Add text (the Khmer font list); shaped with harfrust and drawn as Type 3 outlines with ToUnicode"
+sha256 = "d8c484a43be74972d573740d2238983b7cff6d7ee82648fff580f23156b20eec"
+
+[[asset]]
+path = "assets/fonts/KhmerS1.ttf"
+title = "Khmer S1"
+author = "LIM Sovanvichet"
+source = "Version 1.0 2007, as the project owner supplied it; copyright and licence from the font's name table"
+licence = "LGPL-2.1-or-later"
+licence_file = "assets/fonts/LGPL-2.1.txt"
+kind = "font"
+usage = "A Khmer face the user can pick for Add text (the Khmer font list); shaped with harfrust and drawn as Type 3 outlines with ToUnicode"
+sha256 = "848b5c1552456a754edd8e5853d77013b9a6c53f0b0d7cdfaa5c261be163b0ee"
+
+[[asset]]
+path = "assets/fonts/KhmerS2.ttf"
+title = "Khmer S2"
+author = "LIM Sovanvichet"
+source = "Version 1.0 2007, as the project owner supplied it; copyright and licence from the font's name table"
+licence = "LGPL-2.1-or-later"
+licence_file = "assets/fonts/LGPL-2.1.txt"
+kind = "font"
+usage = "A Khmer face the user can pick for Add text (the Khmer font list); shaped with harfrust and drawn as Type 3 outlines with ToUnicode"
+sha256 = "44e138b9dd9c1cb4ce09b53300faad53cc5dfb9c0f36746311c13e67fc408c94"
+
+[[asset]]
 path = "assets/fonts/Inter-Regular.ttf"
 title = "Inter Regular"
 author = "The Inter Project Authors (Rasmus Andersson)"

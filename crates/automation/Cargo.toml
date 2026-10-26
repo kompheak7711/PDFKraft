@@ -9,6 +9,7 @@ license.workspace = true
 workspace = true
 
 [dependencies]
+pdfkraft-fonts = { workspace = true }
 pdfkraft-engine = { workspace = true }
 pdfkraft-cos = { workspace = true }
 pdfkraft-render = { workspace = true }
@@ -26,7 +27,6 @@ default = ["mcp"]
 mcp = ["dep:base64"]
 
 [dev-dependencies]
-pdfkraft-fonts = { workspace = true }
 png = "0.18"
 flate2.workspace = true
 pdfkraft-model = { workspace = true }

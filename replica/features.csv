@@ -12,7 +12,8 @@ Layers and attachments,viewer,could,yes,yes,same code as upstream
 Add text as page content (Latin; WinAnsi),edit,must,yes,yes,same code as upstream
 Add text: Arabic / Hebrew / Thai (with craft-fonts),edit,should,yes,yes,same optional input as upstream
 Add text: Khmer Unicode with proper shaping,edit,must,no,yes,new: harfrust Khmer shaper; Type 3 glyphs with ToUnicode and ActualText
-Khmer fonts bundled in the application,edit,must,no,yes,new: Noto Sans Khmer and Noto Serif Khmer; Regular and Bold; every build
+Khmer fonts bundled in the application,edit,must,no,yes,new: Noto Sans/Serif Khmer (OFL) plus Khmer OS Battambang/Muol/Siemreap and Khmer M1/M2/S1/S2 (LGPL); every build
+Khmer font picker per text box (format panel; page_add_text khmer_font),edit,must,no,yes,new; saved with the item as /KhmerFont
 Khmer sans/serif and bold follow the item's family and weight,edit,should,no,yes,new
 Khmer word wrapping at zero-width spaces,edit,should,no,yes,new; glyph-safe; not dictionary-based
 Khmer shown in the interface (titles; file names; the text box),edit,must,no,yes,new: Noto Sans Khmer in the font stack
@@ -24,4 +25,5 @@ Own name; app id; icon; links,brand,must,yes,yes,PDFKraft; io.github.kompheak771
 ArtCraft wordmark and logos,brand,could,yes,skip,trademarks: forks must remove them
 ArtCraft Discord and web pages,brand,could,yes,skip,the upstream community; not a feature
 Signed and notarized installers,release,could,yes,skip,needs the signing accounts the release workflow expects
+Unsigned macOS/Windows/Linux builds from Actions (build.yml),release,must,no,yes,new: pre-release build-<run> with dmg/msi/zip/AppImage/deb/rpm/tar
 Native macOS menu bar from craft-menu (upstream commit 64e0868b),viewer,could,yes,no,that commit's pinned craft-libs revision does not build with Cargo 1.97; the fork starts at its parent

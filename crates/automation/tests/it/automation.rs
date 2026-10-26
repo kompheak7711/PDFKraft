@@ -9194,4 +9194,17 @@ fn khmer_text_through_tools_saves_reopens_extracts_and_renders() {
     assert!(rendered.iter().any(|c| matches!(c, Content::Png { data, width, height } if !data.is_empty() && *width > 0 && *height > 0)));
     ok(&mut a, "content_update", json!({"doc": reopened, "page": 1, "index": 1, "text": "កែសម្រួល ខ្មែរ"}));
     assert!(page_text(&mut a, reopened)[0].contains("កែសម្រួល ខ្មែរ"));
+    // A chosen Khmer family: listed back, kept through save and reopen, still extracted; an
+    // unknown one is refused with the list.
+    ok(&mut a, "content_update", json!({"doc": reopened, "page": 1, "index": 1, "khmer_font": "Khmer OS Muol"}));
+    assert_eq!(ok(&mut a, "content_list", json!({"doc": reopened}))["items"][0]["khmer_font"], "Khmer OS Muol");
+    ok(&mut a, "doc_save", json!({"doc": reopened, "path": "khmer-muol.pdf"}));
+    let again = ok(&mut a, "doc_open", json!({"path": "khmer-muol.pdf"}))["doc"].as_u64().unwrap();
+    assert_eq!(ok(&mut a, "content_list", json!({"doc": again}))["items"][0]["khmer_font"], "Khmer OS Muol");
+    assert!(page_text(&mut a, again)[0].contains("កែសម្រួល ខ្មែរ"));
+    let err = a
+        .call("page_add_text", &json!({"doc": again, "page": 1, "text": "ខ្មែរ", "at": [10, 60], "khmer_font": "Khmer Nowhere"}))
+        .unwrap_err()
+        .to_string();
+    assert!(err.contains("Khmer OS Battambang"), "{err}");
 }

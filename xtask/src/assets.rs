@@ -28,6 +28,8 @@ pub const ALLOWED_LICENCES: &[&str] = &[
     "BSD-3-Clause",
     "Apache-2.0",
     "OFL-1.1",
+    // PDFKraft: the Khmer OS and Khmer M/S faces the project owner supplies (AGENTS.md §1.2).
+    "LGPL-2.1-or-later",
     "Ubuntu-font-1.0",
     "Bitstream-Vera",
     "CC0-1.0",
