@@ -27,8 +27,6 @@ pub(crate) enum FontChoice {
     Family(FontFamily),
     /// One of the bundled Khmer families (added text only).
     Khmer(&'static str),
-    /// One of the bundled Khmer families (added text only).
-    Khmer(&'static str),
     /// Load font…: pick a font file.
     Load,
     /// A font file installed on this computer.

@@ -627,7 +627,9 @@ fn format_section(app: &mut PDFKraftApp, ui: &mut egui::Ui, t: &Tokens) {
 /// the Latin beside them with Times when it is a serif family, else Helvetica.
 fn added_text_format(ui: &mut egui::Ui, t: &Tokens, style: &mut pdfkraft_engine::AddedText) {
     let shown = style.khmer_font.clone().unwrap_or_else(|| style.family.label().to_string());
-    let fonts = crate::format_text_ui::Fonts { sources: None, shown, khmer: style.khmer_font.as_deref() };
+    // Cloned: the panel borrows the style mutably while the list shows the chosen family.
+    let khmer = style.khmer_font.clone();
+    let fonts = crate::format_text_ui::Fonts { sources: None, shown, khmer: khmer.as_deref() };
     let out = crate::format_text_ui::panel(ui, t, style, None, fonts);
     match out.font {
         Some(crate::format_text_ui::FontChoice::Family(family)) => {
