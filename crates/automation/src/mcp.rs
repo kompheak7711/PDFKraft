@@ -153,7 +153,7 @@ impl McpServer {
                 Ok(json!({
                     "protocolVersion": version,
                     "capabilities": { "tools": { "listChanged": false }, "resources": { "listChanged": false, "subscribe": false } },
-                    "serverInfo": { "name": "pdfkraft", "title": "PDFKraft", "version": env!("CARGO_PKG_VERSION"), "websiteUrl": pdfkraft_engine::links::APP_PAGE },
+                    "serverInfo": { "name": "pdfkraft", "title": "PDFKraft", "version": env!("CARGO_PKG_VERSION"), "websiteUrl": pdfkraft_engine::links::GITHUB },
                     "instructions": if self.compact { format!("{INSTRUCTIONS}{COMPACT_INSTRUCTIONS}") } else { INSTRUCTIONS.to_string() },
                 }))
             }
