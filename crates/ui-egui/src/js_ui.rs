@@ -2,11 +2,11 @@
 //! the JavaScript console (⌘J), Document JavaScripts, and Preferences ▸ JavaScript.
 
 use egui::{Align, Layout};
-use pdfcraft_engine::js::{JsOutput, Panel, Request};
-use pdfcraft_engine::{DocId, Edit};
+use pdfkraft_engine::js::{JsOutput, Panel, Request};
+use pdfkraft_engine::{DocId, Edit};
 
 use crate::theme::{self, Tokens};
-use crate::{PdfCraftApp, widgets};
+use crate::{PDFKraftApp, widgets};
 
 /// The JavaScript console: the input and the output so far.
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -28,7 +28,7 @@ pub(crate) fn scripts_off_notice() -> String {
     tl!("This form's scripts are turned off because one ran too long. Reopen the document to run them again.").to_string()
 }
 
-impl PdfCraftApp {
+impl PDFKraftApp {
     /// Act on what scripts produced in document `id`: alerts are shown, console output goes to
     /// the console, print and page requests are carried out, links wait for the user's permission
     /// (form submissions are reported, never sent).
@@ -63,7 +63,7 @@ impl PdfCraftApp {
                 }
                 Request::LaunchUrl(u) => self.request_document_url(&u, crate::LinkOrigin::Script),
                 Request::Submit(u) => self.notify_fmt(
-                    "The form asks to be submitted to {u}; PdfCraft doesn't send form data. Save the document to keep your entries.",
+                    "The form asks to be submitted to {u}; PDFKraft doesn't send form data. Save the document to keep your entries.",
                     &[("u", &u)],
                 ),
                 Request::SaveAs => self.run_command("file.save_as"),
@@ -177,7 +177,7 @@ fn buttons(ui: &mut egui::Ui, primary: &str, others: &[&str]) -> Option<String> 
 }
 
 /// The JavaScript console. Returns `true` to close.
-pub(crate) fn console_body(ui: &mut egui::Ui, app: &mut PdfCraftApp, t: &Tokens) -> bool {
+pub(crate) fn console_body(ui: &mut egui::Ui, app: &mut PDFKraftApp, t: &Tokens) -> bool {
     ui.label(egui::RichText::new(tl!("JavaScript Console")).font(theme::semibold(18.0)));
     ui.add_space(6.0);
     if !app.session.javascript() {
@@ -218,7 +218,7 @@ pub(crate) fn console_body(ui: &mut egui::Ui, app: &mut PdfCraftApp, t: &Tokens)
 }
 
 /// Document JavaScripts: list, edit, add and delete. Returns `true` to close.
-pub(crate) fn document_js_body(ui: &mut egui::Ui, app: &mut PdfCraftApp, t: &Tokens) -> bool {
+pub(crate) fn document_js_body(ui: &mut egui::Ui, app: &mut PDFKraftApp, t: &Tokens) -> bool {
     ui.label(egui::RichText::new(tl!("Document JavaScripts")).font(theme::semibold(18.0)));
     ui.add_space(6.0);
     let scripts = app.active_ids().and_then(|(_, id)| app.session.get(id)).map(|d| d.document_scripts()).unwrap_or_default();
@@ -265,7 +265,7 @@ pub(crate) fn document_js_body(ui: &mut egui::Ui, app: &mut PdfCraftApp, t: &Tok
     close
 }
 
-/// The label for a [`pdfcraft_render::ReadingColors`] mode name (`mode_name`).
+/// The label for a [`pdfkraft_render::ReadingColors`] mode name (`mode_name`).
 fn reading_mode_label(mode: &str) -> &'static str {
     match mode {
         "black-on-white" => "Black on white",
@@ -305,7 +305,7 @@ fn picker_text_is_drawable(ui: &egui::Ui, text: &str) -> bool {
 /// same drawable-name fallback: a native name whose script this build has no face for would
 /// otherwise abort under egui 0.37's `MissingGlyphPolicy::Panic` (for example Hindi without a
 /// Devanagari face and installed system fonts turned off).
-fn date_language_picker_name(l: &pdfcraft_engine::dates::DateLanguage, drawable: impl FnOnce(&str) -> bool) -> &'static str {
+fn date_language_picker_name(l: &pdfkraft_engine::dates::DateLanguage, drawable: impl FnOnce(&str) -> bool) -> &'static str {
     match crate::i18n::Lang::from_code(l.code) {
         Some(language) => language.picker_name(drawable),
         None => l.name,
@@ -314,7 +314,7 @@ fn date_language_picker_name(l: &pdfcraft_engine::dates::DateLanguage, drawable:
 
 /// Preferences: interface language and size, appearance, identity and JavaScript. Drawn in a scroll
 /// area; [`preferences_buttons`] goes below it, outside the scroll, so OK is always in reach.
-pub(crate) fn preferences_body(ui: &mut egui::Ui, app: &mut PdfCraftApp, t: &Tokens) {
+pub(crate) fn preferences_body(ui: &mut egui::Ui, app: &mut PDFKraftApp, t: &Tokens) {
     ui.label(egui::RichText::new(tl!("Preferences")).font(theme::semibold(18.0)));
     ui.horizontal(|ui| {
         let label = ui.label(tl!("Interface language"));
@@ -449,7 +449,7 @@ pub(crate) fn preferences_body(ui: &mut egui::Ui, app: &mut PdfCraftApp, t: &Tok
     ui.label(egui::RichText::new(tl!("For page sizes and margins.")).small().color(t.text_muted));
     // The web build has no file paths to reopen.
     #[cfg(not(target_arch = "wasm32"))]
-    ui.add(widgets::checkbox(&mut app.reopen_last_session, tl!("Reopen the files that were open when PdfCraft last closed")));
+    ui.add(widgets::checkbox(&mut app.reopen_last_session, tl!("Reopen the files that were open when PDFKraft last closed")));
     // Acrobat's "Restore last view settings when reopening documents" (#1767).
     #[cfg(not(target_arch = "wasm32"))]
     ui.add(widgets::checkbox(&mut app.restore_last_view, tl!("Restore the last view (page, zoom and page display) when a document is opened again")));
@@ -498,17 +498,17 @@ pub(crate) fn preferences_body(ui: &mut egui::Ui, app: &mut PdfCraftApp, t: &Tok
                 ] {
                     if ui.selectable_label(mode == m, tl!(label)).clicked() {
                         match m {
-                            "off" => app.set_reading_colors(pdfcraft_render::ReadingColors::default()),
+                            "off" => app.set_reading_colors(pdfkraft_render::ReadingColors::default()),
                             "custom" => {
                                 // Custom starts from the colours already chosen, or black on white.
-                                let colors = app.reading_colors.params.map_or(pdfcraft_render::ReadingColors::BLACK_ON_WHITE, |params| {
-                                    pdfcraft_render::ReadingColors { params: Some(params) }
+                                let colors = app.reading_colors.params.map_or(pdfkraft_render::ReadingColors::BLACK_ON_WHITE, |params| {
+                                    pdfkraft_render::ReadingColors { params: Some(params) }
                                 });
                                 app.set_reading_colors(colors);
                             }
                             // `parse` knows these names; a preset comes with its own flags.
                             preset => {
-                                if let Ok(colors) = pdfcraft_render::ReadingColors::parse(preset, None, None, None, None) {
+                                if let Ok(colors) = pdfkraft_render::ReadingColors::parse(preset, None, None, None, None) {
                                     app.set_reading_colors(colors);
                                 }
                             }
@@ -582,10 +582,10 @@ pub(crate) fn preferences_buttons(ui: &mut egui::Ui) -> bool {
 /// Preferences ▸ Date format: a preset, or any pattern typed in, for Fill & Sign dates, and the
 /// language of its month and weekday names. A valid pattern applies as it's typed; an invalid
 /// one stays in the box with the reason, and the last valid one stays in use.
-fn date_format(ui: &mut egui::Ui, app: &mut PdfCraftApp, t: &Tokens) {
-    use pdfcraft_engine::dates::{DATE_FORMATS, DATE_LANGUAGES, MAX_DATE_FORMAT_CHARS};
+fn date_format(ui: &mut egui::Ui, app: &mut PDFKraftApp, t: &Tokens) {
+    use pdfkraft_engine::dates::{DATE_FORMATS, DATE_LANGUAGES, MAX_DATE_FORMAT_CHARS};
     ui.label(egui::RichText::new(tl!("Date format")).font(theme::semibold(13.0)));
-    let sample = |app: &PdfCraftApp, f: &str| format!("{}   {f}", app.date_text(Some(f)).unwrap_or_default());
+    let sample = |app: &PDFKraftApp, f: &str| format!("{}   {f}", app.date_text(Some(f)).unwrap_or_default());
     ui.horizontal(|ui| {
         let label = ui.label(tl!("Fill & Sign dates"));
         let current = app.session.date_format().to_string();
@@ -614,7 +614,7 @@ fn date_format(ui: &mut egui::Ui, app: &mut PdfCraftApp, t: &Tokens) {
             let _ = app.session.set_date_format(&text);
             app.date_format_draft = Some(text.clone());
         }
-        if !edit.has_focus() && pdfcraft_engine::dates::check_date_format(&text).is_ok() {
+        if !edit.has_focus() && pdfkraft_engine::dates::check_date_format(&text).is_ok() {
             app.date_format_draft = None;
         }
         match app.date_text(Some(&text)) {
@@ -624,7 +624,7 @@ fn date_format(ui: &mut egui::Ui, app: &mut PdfCraftApp, t: &Tokens) {
         };
     });
     // Fill & Sign refuses a date it would save as "?"; say so before anyone tries.
-    let bad = app.date_text(None).map(|today| pdfcraft_engine::dates::unwritable(&today)).unwrap_or_default();
+    let bad = app.date_text(None).map(|today| pdfkraft_engine::dates::unwritable(&today)).unwrap_or_default();
     if !bad.is_empty() {
         ui.label(
             egui::RichText::new(crate::i18n::fmt(
@@ -685,13 +685,13 @@ mod tests {
 
     #[test]
     fn date_language_names_fall_back_when_the_native_name_cannot_be_drawn() {
-        let date_language = |code: &str| pdfcraft_engine::dates::DATE_LANGUAGES.iter().find(|l| l.code == code).expect("date language");
+        let date_language = |code: &str| pdfkraft_engine::dates::DATE_LANGUAGES.iter().find(|l| l.code == code).expect("date language");
         let hindi = date_language("hi");
         assert_eq!(date_language_picker_name(hindi, |_| true), hindi.name, "the native name is kept when it can be drawn");
         assert_eq!(date_language_picker_name(hindi, |_| false), "Hindi", "no Devanagari face: show the English name");
         let chinese = date_language("zh-hans");
         assert_eq!(date_language_picker_name(chinese, |_| false), "Simplified Chinese");
-        for language in &pdfcraft_engine::dates::DATE_LANGUAGES {
+        for language in &pdfkraft_engine::dates::DATE_LANGUAGES {
             assert!(!date_language_picker_name(language, |_| false).is_empty(), "{}", language.code);
         }
     }

@@ -4,8 +4,8 @@
 //! Delete to remove it. Each change is one undoable engine edit.
 
 use egui::{Color32, CornerRadius, Pos2, Rect, Stroke};
-use pdfcraft_engine::{Added, AddedContent, AddedText, Edit};
-use pdfcraft_render::DocInfo;
+use pdfkraft_engine::{Added, AddedContent, AddedText, Edit};
+use pdfkraft_render::DocInfo;
 
 use crate::canvas::{DocView, PageXform};
 use crate::page_pointer::PagePointer;
@@ -25,7 +25,7 @@ pub(crate) fn undrawable(d: &TextDraft, memo: &UndrawableMemo) -> Option<char> {
     {
         return *c;
     }
-    let c = pdfcraft_engine::first_undrawable(&t);
+    let c = pdfkraft_engine::first_undrawable(&t);
     *memo.borrow_mut() = Some((t, c));
     c
 }
@@ -43,15 +43,15 @@ pub(crate) fn undrawable_message(c: char) -> String {
     )
 }
 
-/// The warning after an edit that saved text its font can't draw: PdfCraft drew `?` for it (a form
+/// The warning after an edit that saved text its font can't draw: PDFKraft drew `?` for it (a form
 /// field, which other viewers redraw from its value, or a comment, where the `?` shows everywhere).
-pub(crate) fn undrawn_message(n: &pdfcraft_engine::TextNotice) -> String {
+pub(crate) fn undrawn_message(n: &pdfkraft_engine::TextNotice) -> String {
     let template = if n.redrawn_elsewhere {
         tl!(
-            "This field's font can't draw “{c}” ({code}), so PdfCraft shows ? in its place. The value is saved, and other PDF viewers redraw the field from it."
+            "This field's font can't draw “{c}” ({code}), so PDFKraft shows ? in its place. The value is saved, and other PDF viewers redraw the field from it."
         )
     } else {
-        tl!("The fonts PdfCraft writes with can't draw “{c}” ({code}), so it shows as ? in every PDF viewer. The text is saved.")
+        tl!("The fonts PDFKraft writes with can't draw “{c}” ({code}), so it shows as ? in every PDF viewer. The text is saved.")
     };
     crate::i18n::fmt(template, &[("c", &n.ch.to_string()), ("code", &format!("U+{:04X}", u32::from(n.ch)))])
 }
@@ -121,11 +121,11 @@ impl ContentView {
 #[derive(Default)]
 pub(crate) struct MoveBackground {
     key: Option<(u64, usize, usize)>,
-    renderer: Option<pdfcraft_render::RenderPool>,
+    renderer: Option<pdfkraft_render::RenderPool>,
     texture: Option<egui::TextureHandle>,
     /// The item alone on a transparent page: the pixels that follow the pointer. The page's own
     /// raster has whatever the item covers in its box too, which must stay where it is (#4464).
-    item_renderer: Option<pdfcraft_render::RenderPool>,
+    item_renderer: Option<pdfkraft_render::RenderPool>,
     item: Option<egui::TextureHandle>,
     tag: Option<u64>,
     /// The item's display-space box when the gesture started.
@@ -147,7 +147,7 @@ impl MoveBackground {
         self.texture.is_some() && self.item.is_some()
     }
 
-    pub fn prepare(&mut self, ctx: &egui::Context, doc: &pdfcraft_engine::Document, cv: &ContentView, scale: f32) {
+    pub fn prepare(&mut self, ctx: &egui::Context, doc: &pdfkraft_engine::Document, cv: &ContentView, scale: f32) {
         let picture = |page, index| on_page(doc.added(), page).into_iter().any(|(i, a)| i == index && matches!(a.content, AddedContent::Image(_)));
         let key = match (cv.grab, cv.selected) {
             (Some((gp, Grab::Move, _)), Some((sp, si))) if gp == sp => Some((doc.edit_generation(), sp, si)),
@@ -176,7 +176,7 @@ impl MoveBackground {
         let tag = (scale * 1000.0) as u64;
         if self.tag != Some(tag) {
             for r in [renderer, item_renderer] {
-                r.set_queue(vec![pdfcraft_render::RenderRequest { page, scale, tag, ..Default::default() }]);
+                r.set_queue(vec![pdfkraft_render::RenderRequest { page, scale, tag, ..Default::default() }]);
             }
             self.tag = Some(tag);
         }
@@ -562,11 +562,11 @@ pub(crate) fn editor(ctx: &egui::Context, view: &mut DocView, info: &DocInfo, ad
             draft.rect = source;
         } else {
             let natural = ctx.fonts_mut(|f| f.layout_no_wrap(draft.text.clone(), font.clone(), Color32::BLACK).size().x) as f64 / zoom as f64;
-            let width = natural.max(pdfcraft_engine::added_text_width(&text)) + 2.0;
+            let width = natural.max(pdfkraft_engine::added_text_width(&text)) + 2.0;
             let available = page_width - source[0];
             let width = width.max(source[2] - source[0]).min(available.max(1.0));
             draft.rect = [source[0], source[1], source[0] + width, source[3]];
-            draft.rect = pdfcraft_engine::added_text_rect(&AddedText { rect: draft.rect, ..text.clone() });
+            draft.rect = pdfkraft_engine::added_text_rect(&AddedText { rect: draft.rect, ..text.clone() });
         }
         view.content.layout = Some((text, zoom, page_width, draft.rect));
     }
@@ -577,9 +577,9 @@ pub(crate) fn editor(ctx: &egui::Context, view: &mut DocView, info: &DocInfo, ad
     // right-aligned text, both halves for centred), so the text stays where the page draws it.
     let width = r.width().max(60.0);
     let anchor = match draft.style.align {
-        pdfcraft_engine::TextAlign::Center => 0.5,
-        pdfcraft_engine::TextAlign::Right => 1.0,
-        pdfcraft_engine::TextAlign::Left | pdfcraft_engine::TextAlign::Justify => 0.0,
+        pdfkraft_engine::TextAlign::Center => 0.5,
+        pdfkraft_engine::TextAlign::Right => 1.0,
+        pdfkraft_engine::TextAlign::Left | pdfkraft_engine::TextAlign::Justify => 0.0,
     };
     let at = r.min - egui::vec2((width - r.width()) * anchor, 0.0);
     let background_ready = draft.index.is_some_and(|index| view.text_background.ready_added(page, index));
@@ -608,9 +608,9 @@ pub(crate) fn editor(ctx: &egui::Context, view: &mut DocView, info: &DocInfo, ad
             // Laid out as the page draws it, so opening the box doesn't show it realigned.
             // shortcut: justified text is shown left-aligned here (TextEdit can't justify), until the editor gets its own layouter.
             let halign = match t.style.align {
-                pdfcraft_engine::TextAlign::Center => egui::Align::Center,
-                pdfcraft_engine::TextAlign::Right => egui::Align::Max,
-                pdfcraft_engine::TextAlign::Left | pdfcraft_engine::TextAlign::Justify => egui::Align::Min,
+                pdfkraft_engine::TextAlign::Center => egui::Align::Center,
+                pdfkraft_engine::TextAlign::Right => egui::Align::Max,
+                pdfkraft_engine::TextAlign::Left | pdfkraft_engine::TextAlign::Justify => egui::Align::Min,
             };
             // Character spacing shows as the page will draw it, scaled like the font.
             let letter_spacing = (t.style.char_spacing * f64::from(zoom)) as f32;
@@ -709,7 +709,7 @@ pub(crate) fn hint(ui: &mut egui::Ui, t: &Tokens) {
     ui.add_space(4.0);
 }
 
-impl crate::PdfCraftApp {
+impl crate::PDFKraftApp {
     /// Pick an image file for the active document, read it, and call `then` with its name and
     /// bytes: now when `save_override` answers (tests and automation never see a native dialog),
     /// otherwise on a later frame, and only if that document is still the active one.
@@ -750,7 +750,7 @@ impl crate::PdfCraftApp {
             app.apply_edit(Edit::EditPageImage {
                 page,
                 index,
-                change: pdfcraft_engine::ImageEdit::Replace { name, bytes: std::sync::Arc::new(bytes) },
+                change: pdfkraft_engine::ImageEdit::Replace { name, bytes: std::sync::Arc::new(bytes) },
             });
         });
         #[cfg(target_arch = "wasm32")]
@@ -820,7 +820,7 @@ impl crate::PdfCraftApp {
     /// Cut: copy the picture, and only when that worked take it off the page (one undo step).
     pub(crate) fn cut_page_image(&mut self, page: usize, index: usize) {
         if self.copy_page_image(page, index) {
-            self.apply_edit(Edit::EditPageImage { page, index, change: pdfcraft_engine::ImageEdit::Delete });
+            self.apply_edit(Edit::EditPageImage { page, index, change: pdfkraft_engine::ImageEdit::Delete });
         }
     }
 
@@ -829,7 +829,7 @@ impl crate::PdfCraftApp {
     pub(crate) fn redact_page_image(&mut self, page: usize, index: usize) {
         let Some(rect) = self.page_image_box(page, index) else { return };
         let author = self.comment_prefs.author.clone();
-        let mark = self.redact_prefs.mark(page, vec![pdfcraft_engine::rect_quad(rect)], &author);
+        let mark = self.redact_prefs.mark(page, vec![pdfkraft_engine::rect_quad(rect)], &author);
         if self.apply_edit(mark) {
             self.notify_tr("The image is marked for redaction. Apply it with Redact a PDF");
         }
@@ -930,7 +930,7 @@ impl crate::PdfCraftApp {
 
 /// What the image tools ask for.
 pub(crate) enum ImageAction {
-    Update(pdfcraft_engine::AddedContent),
+    Update(pdfkraft_engine::AddedContent),
     Replace,
 }
 
@@ -940,13 +940,13 @@ const FLIP_HORIZONTAL_ICON: &str = "flip-vertical-2";
 const FLIP_VERTICAL_ICON: &str = "flip-horizontal-2";
 
 /// Edit image: rotate, flip, crop, replace (shown while an added image is selected).
-pub(crate) fn image_panel(ui: &mut egui::Ui, t: &Tokens, img: &pdfcraft_engine::AddedImage) -> Option<ImageAction> {
+pub(crate) fn image_panel(ui: &mut egui::Ui, t: &Tokens, img: &pdfkraft_engine::AddedImage) -> Option<ImageAction> {
     let mut out = None;
     widgets::section_title(ui, tl!("Edit image"));
     ui.horizontal(|ui| {
         let mut i = img.clone();
         let r = i.rect;
-        let turn = |i: &mut pdfcraft_engine::AddedImage, k: u8| {
+        let turn = |i: &mut pdfkraft_engine::AddedImage, k: u8| {
             i.rotation = (i.rotation + k) % 4;
             // The box turns with the picture, around its centre.
             let (cx, cy, w, h) = ((r[0] + r[2]) / 2.0, (r[1] + r[3]) / 2.0, r[2] - r[0], r[3] - r[1]);
@@ -973,7 +973,7 @@ pub(crate) fn image_panel(ui: &mut egui::Ui, t: &Tokens, img: &pdfcraft_engine::
         }
     });
     ui.label(egui::RichText::new(tl!("Crop (% trimmed from each side)")).small().color(t.text_muted));
-    let most = (1.0 - pdfcraft_engine::AddedImage::MIN_CROP_KEEP) * 100.0;
+    let most = (1.0 - pdfkraft_engine::AddedImage::MIN_CROP_KEEP) * 100.0;
     // Unrounded: a side the user doesn't touch keeps its stored value, also one read from a file.
     let shown = img.crop.map(|v| v * 100.0);
     let mut crop = shown;
@@ -1020,11 +1020,11 @@ mod tests {
     use super::*;
 
     /// The image a flip button leaves behind, as the panel returns it.
-    fn flipped(tooltip: &str) -> pdfcraft_engine::AddedImage {
-        let img = pdfcraft_engine::AddedImage::new([0.0, 0.0, 100.0, 50.0], pdfcraft_cos::ObjRef::new(7, 0));
+    fn flipped(tooltip: &str) -> pdfkraft_engine::AddedImage {
+        let img = pdfkraft_engine::AddedImage::new([0.0, 0.0, 100.0, 50.0], pdfkraft_cos::ObjRef::new(7, 0));
         let mut fonts = false;
         let mut h = egui_kittest::Harness::new_ui_state(
-            move |ui, out: &mut Option<pdfcraft_engine::AddedImage>| {
+            move |ui, out: &mut Option<pdfkraft_engine::AddedImage>| {
                 // The app's fonts (the semibold section title) take effect from the next frame.
                 if !fonts {
                     ui.ctx().set_fonts(crate::theme::font_definitions());
@@ -1071,8 +1071,8 @@ mod tests {
         let texture = |name| Some(ctx.load_texture(name, egui::ColorImage::filled([1, 1], Color32::WHITE), egui::TextureOptions::LINEAR));
         // Bytes no parser accepts: every render answers with an error.
         let pool = || {
-            let pool = pdfcraft_render::RenderPool::new_inline(std::sync::Arc::new(b"not a pdf".to_vec()), Default::default());
-            pool.set_queue(vec![pdfcraft_render::RenderRequest { page: 0, scale: 2.0, tag: 2000, ..Default::default() }]);
+            let pool = pdfkraft_render::RenderPool::new_inline(std::sync::Arc::new(b"not a pdf".to_vec()), Default::default());
+            pool.set_queue(vec![pdfkraft_render::RenderRequest { page: 0, scale: 2.0, tag: 2000, ..Default::default() }]);
             pool
         };
         let mut mb = MoveBackground {

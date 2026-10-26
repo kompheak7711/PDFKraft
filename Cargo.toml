@@ -2,59 +2,59 @@
 resolver = "3"
 members = ["crates/*", "apps/*", "xtask"]
 exclude = ["vendor"]
-default-members = ["crates/*", "apps/pdfcraft", "apps/pdfcraft-cli", "xtask"]
+default-members = ["crates/*", "apps/pdfkraft", "apps/pdfkraft-cli", "xtask"]
 
 [workspace.package]
 version = "0.14.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.95"
-repository = "https://github.com/storytold/pdfcraft"
+repository = "https://github.com/kompheak7711/PDFKraft"
 
 [workspace.dependencies]
 # Shared frontend components; engines remain independent of egui.
 craft-ui = { git = "https://github.com/storytold/craft-libs", version = "0.1.0", rev = "42e30cd5b3f4b114270dd053fccbc33bedc47f68", features = ["serde"] }
 # Quit the macOS way (#1136): ⌘Q asks about unsaved changes, and closing quits through `terminate:`.
 craft-quit = { git = "https://github.com/storytold/craft-libs", version = "0.1.0", rev = "42e30cd5b3f4b114270dd053fccbc33bedc47f68" }
-# Shared system spooler; document composition remains in pdfcraft-print.
+# Shared system spooler; document composition remains in pdfkraft-print.
 craft-print = { git = "https://github.com/storytold/craft-libs", version = "0.1.0", rev = "42e30cd5b3f4b114270dd053fccbc33bedc47f68" }
 # Whether a path stored in a document may be opened (GoToR link targets).
 craft-docpath = { version = "0.1.0", git = "https://github.com/storytold/craft-libs", rev = "82a24b006eefa036b43c09a67fb9a3fbd17ffe63" }
 craft-update = { git = "https://github.com/storytold/craft-libs", version = "=0.1.0", rev = "495e5971bc024aa96e6ed318cb6e7cd3a0103184", features = ["egui"] }
 # internal
-pdfcraft-geom = { path = "crates/geom", version = "0.14.0" }
-pdfcraft-filters = { path = "crates/filters", version = "0.14.0" }
-pdfcraft-cos = { path = "crates/cos", version = "0.14.0" }
-pdfcraft-crypt = { path = "crates/crypt", version = "0.14.0" }
-pdfcraft-organize = { path = "crates/organize", version = "0.14.0" }
-pdfcraft-measure = { path = "crates/measure", version = "0.14.0" }
-pdfcraft-annot = { path = "crates/annot", version = "0.14.0" }
-pdfcraft-audit = { path = "crates/audit", version = "0.14.0" }
-pdfcraft-fonts = { path = "crates/fonts", version = "0.14.0" }
-pdfcraft-model = { path = "crates/model", version = "0.14.0" }
-pdfcraft-content = { path = "crates/content", version = "0.14.0" }
-pdfcraft-redact = { path = "crates/redact", version = "0.14.0" }
-pdfcraft-print = { path = "crates/print", version = "0.14.0" }
-pdfcraft-xfdf = { path = "crates/xfdf", version = "0.14.0" }
-pdfcraft-sign = { path = "crates/sign", version = "0.14.0" }
-pdfcraft-optimize = { path = "crates/optimize", version = "0.14.0" }
-pdfcraft-a11y = { path = "crates/a11y", version = "0.14.0" }
-pdfcraft-oracle = { path = "crates/oracle", version = "0.14.0" }
-pdfcraft-testkit = { path = "crates/testkit", version = "0.14.0" }
-pdfcraft-ocr = { path = "crates/ocr", version = "0.14.0" }
-pdfcraft-js = { path = "crates/js", version = "0.14.0" }
-pdfcraft-compare = { path = "crates/compare", version = "0.14.0" }
-pdfcraft-preflight = { path = "crates/preflight", version = "0.14.0" }
-pdfcraft-export = { path = "crates/export", version = "0.14.0" }
-pdfcraft-edit = { path = "crates/edit", version = "0.14.0" }
-pdfcraft-create = { path = "crates/create", version = "0.14.0" }
-pdfcraft-forms = { path = "crates/forms", version = "0.14.0" }
-pdfcraft-xfa = { path = "crates/xfa", version = "0.14.0" }
-pdfcraft-render = { path = "crates/render", version = "0.14.0" }
-pdfcraft-engine = { path = "crates/engine", version = "0.14.0" }
-pdfcraft-platform = { path = "crates/platform", version = "0.14.0" }
-pdfcraft-ui-egui = { path = "crates/ui-egui", version = "0.14.0" }
-pdfcraft-automation = { path = "crates/automation", version = "0.14.0", default-features = false }
+pdfkraft-geom = { path = "crates/geom", version = "0.14.0" }
+pdfkraft-filters = { path = "crates/filters", version = "0.14.0" }
+pdfkraft-cos = { path = "crates/cos", version = "0.14.0" }
+pdfkraft-crypt = { path = "crates/crypt", version = "0.14.0" }
+pdfkraft-organize = { path = "crates/organize", version = "0.14.0" }
+pdfkraft-measure = { path = "crates/measure", version = "0.14.0" }
+pdfkraft-annot = { path = "crates/annot", version = "0.14.0" }
+pdfkraft-audit = { path = "crates/audit", version = "0.14.0" }
+pdfkraft-fonts = { path = "crates/fonts", version = "0.14.0" }
+pdfkraft-model = { path = "crates/model", version = "0.14.0" }
+pdfkraft-content = { path = "crates/content", version = "0.14.0" }
+pdfkraft-redact = { path = "crates/redact", version = "0.14.0" }
+pdfkraft-print = { path = "crates/print", version = "0.14.0" }
+pdfkraft-xfdf = { path = "crates/xfdf", version = "0.14.0" }
+pdfkraft-sign = { path = "crates/sign", version = "0.14.0" }
+pdfkraft-optimize = { path = "crates/optimize", version = "0.14.0" }
+pdfkraft-a11y = { path = "crates/a11y", version = "0.14.0" }
+pdfkraft-oracle = { path = "crates/oracle", version = "0.14.0" }
+pdfkraft-testkit = { path = "crates/testkit", version = "0.14.0" }
+pdfkraft-ocr = { path = "crates/ocr", version = "0.14.0" }
+pdfkraft-js = { path = "crates/js", version = "0.14.0" }
+pdfkraft-compare = { path = "crates/compare", version = "0.14.0" }
+pdfkraft-preflight = { path = "crates/preflight", version = "0.14.0" }
+pdfkraft-export = { path = "crates/export", version = "0.14.0" }
+pdfkraft-edit = { path = "crates/edit", version = "0.14.0" }
+pdfkraft-create = { path = "crates/create", version = "0.14.0" }
+pdfkraft-forms = { path = "crates/forms", version = "0.14.0" }
+pdfkraft-xfa = { path = "crates/xfa", version = "0.14.0" }
+pdfkraft-render = { path = "crates/render", version = "0.14.0" }
+pdfkraft-engine = { path = "crates/engine", version = "0.14.0" }
+pdfkraft-platform = { path = "crates/platform", version = "0.14.0" }
+pdfkraft-ui-egui = { path = "crates/ui-egui", version = "0.14.0" }
+pdfkraft-automation = { path = "crates/automation", version = "0.14.0", default-features = false }
 
 # pdf
 hayro = "0.7.1"

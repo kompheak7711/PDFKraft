@@ -8,7 +8,7 @@
 //! - [`ControlPlugin`], an egui plugin, keeps a copy of the AccessKit tree from every frame's
 //!   output (the widget tree with ids, roles, labels, rects and states) and injects queued input
 //!   events (AccessKit click actions, pointer events, keys, text) at the start of later frames.
-//! - Requests reach the app through a channel; `PdfCraftApp` answers them at the start of a
+//! - Requests reach the app through a channel; `PDFKraftApp` answers them at the start of a
 //!   frame, so they see and change exactly what the user would.
 //!
 //! Methods (JSON in, JSON out):
@@ -217,7 +217,7 @@ pub struct ControlPlugin {
 
 impl egui::Plugin for ControlPlugin {
     fn debug_name(&self) -> &'static str {
-        "pdfcraft-control"
+        "pdfkraft-control"
     }
 
     /// Inject admitted control batches into the current pass, dropping stale requests, applying cancellations
@@ -568,7 +568,7 @@ pub fn attach(ctx: &egui::Context) -> (Control, ControlClient) {
     (Control { rx, shared, pending: Vec::new(), deferred: VecDeque::new() }, ControlClient { tx, ctx: ctx.clone() })
 }
 
-/// What a request needs from the app (implemented by `PdfCraftApp`).
+/// What a request needs from the app (implemented by `PDFKraftApp`).
 pub(crate) trait Host {
     /// Return the UI-state snapshot reported by `ui.state`.
     fn state(&self) -> Value;
@@ -1343,7 +1343,7 @@ fn screenshot_png(image: &egui::ColorImage, region: Option<egui::Rect>, geometry
     }))
 }
 
-impl Host for crate::PdfCraftApp {
+impl Host for crate::PDFKraftApp {
     /// Cancel any in-progress pointer gesture in every open view.
     fn cancel_pointer_gestures(&mut self) {
         for view in &mut self.views {
@@ -1493,7 +1493,7 @@ impl Host for crate::PdfCraftApp {
     }
 
     fn command(&mut self, id: &str) -> Reply {
-        let spec = pdfcraft_engine::commands::command(id).ok_or_else(|| format!("unknown command {id:?} (see ui.commands)"))?;
+        let spec = pdfkraft_engine::commands::command(id).ok_or_else(|| format!("unknown command {id:?} (see ui.commands)"))?;
         if !self.command_enabled(spec) {
             return Err(format!("{id} is disabled right now"));
         }
@@ -1502,7 +1502,7 @@ impl Host for crate::PdfCraftApp {
     }
 
     fn commands(&self) -> Value {
-        let mut list: Vec<Value> = pdfcraft_engine::commands::COMMANDS
+        let mut list: Vec<Value> = pdfkraft_engine::commands::COMMANDS
             .iter()
             .map(|c| json!({ "id": c.id, "label": c.label, "menu": c.menu, "enabled": self.command_enabled(c), "shortcut": c.shortcut.map(|s| s.label(cfg!(target_os = "macos"))) }))
             .collect();
@@ -1684,7 +1684,7 @@ fn serve_with(client: ControlClient, limits: Limits) -> std::io::Result<Endpoint
     let expected = token.clone();
     let waiting = std::sync::Arc::new(std::sync::atomic::AtomicUsize::new(0));
     let lingering = std::sync::Arc::new(std::sync::atomic::AtomicUsize::new(0));
-    std::thread::Builder::new().name("pdfcraft-control".into()).spawn(move || {
+    std::thread::Builder::new().name("pdfkraft-control".into()).spawn(move || {
         for stream in accepted(listener.incoming(), || std::thread::sleep(ACCEPT_RETRY)) {
             let _ = stream.set_write_timeout(Some(limits.write_timeout));
             // Admitted only while fewer than the limit wait to authenticate: refused on the
@@ -1698,7 +1698,7 @@ fn serve_with(client: ControlClient, limits: Limits) -> std::io::Result<Endpoint
             let client = client.clone();
             let expected = expected.clone();
             let lingering = lingering.clone();
-            let _ = std::thread::Builder::new().name("pdfcraft-control-conn".into()).spawn(move || {
+            let _ = std::thread::Builder::new().name("pdfkraft-control-conn".into()).spawn(move || {
                 // Held until `auth` succeeds; given back however this thread ends.
                 let mut slot = Some(slot);
                 let Ok(read) = stream.try_clone() else { return };
@@ -2689,11 +2689,11 @@ mod lifecycle_tests {
         }
     }
 
-    fn marquee_harness() -> (Harness<'static, crate::PdfCraftApp>, ControlClient) {
+    fn marquee_harness() -> (Harness<'static, crate::PDFKraftApp>, ControlClient) {
         let client_slot: Arc<Mutex<Option<ControlClient>>> = Arc::new(Mutex::new(None));
         let slot = client_slot.clone();
         let h = Harness::builder().with_size(egui::vec2(1200.0, 900.0)).with_step_dt(0.01).build_eframe(move |cc| {
-            let mut app = crate::PdfCraftApp::new();
+            let mut app = crate::PDFKraftApp::new();
             app.set_option("language", "en").unwrap();
             app.open_bytes("synthetic-form.pdf", None, include_bytes!("../tests/data/form.pdf").to_vec()).unwrap();
             app.set_option("quick", "marquee-zoom").unwrap();
@@ -2704,7 +2704,7 @@ mod lifecycle_tests {
         (h, client)
     }
 
-    fn marquee_step(h: &mut Harness<'static, crate::PdfCraftApp>) {
+    fn marquee_step(h: &mut Harness<'static, crate::PDFKraftApp>) {
         let ctx = h.ctx.clone();
         let mut raw = std::mem::take(h.input_mut());
         h.state_mut().prepare_raw_input(&ctx, &mut raw);
@@ -2713,7 +2713,7 @@ mod lifecycle_tests {
     }
 
     /// The actual laid-out page rect and a short point gesture inside it.
-    fn gesture_target(h: &Harness<'static, crate::PdfCraftApp>) -> (egui::Pos2, egui::Pos2) {
+    fn gesture_target(h: &Harness<'static, crate::PDFKraftApp>) -> (egui::Pos2, egui::Pos2) {
         let page = h.state().views[0].page_screen_rect(0).expect("the actual PDF page was laid out").intersect(h.state().views[0].viewport_rect());
         assert!(page.width() > 100.0 && page.height() > 100.0, "a visible hit target: {page:?}");
         let from = page.center();
@@ -2723,7 +2723,7 @@ mod lifecycle_tests {
     }
 
     /// Step until the public request has really reached egui and can still be interrupted.
-    fn await_gesture_admission(h: &mut Harness<'static, crate::PdfCraftApp>, gesture: Gesture) -> bool {
+    fn await_gesture_admission(h: &mut Harness<'static, crate::PDFKraftApp>, gesture: Gesture) -> bool {
         let mut admitted = false;
         for _ in 0..8 {
             marquee_step(h);
@@ -2741,7 +2741,7 @@ mod lifecycle_tests {
     }
 
     /// The request is queued exactly once, with the expected terminal batch not yet applied.
-    fn assert_interruptible_admission(h: &Harness<'static, crate::PdfCraftApp>, gesture: Gesture, from: egui::Pos2) {
+    fn assert_interruptible_admission(h: &Harness<'static, crate::PDFKraftApp>, gesture: Gesture, from: egui::Pos2) {
         {
             let shared = h.state().control.as_ref().unwrap().shared.lock().unwrap();
             assert_eq!(shared.inject.len(), 1, "only the actual public request is queued");
@@ -2775,7 +2775,7 @@ mod lifecycle_tests {
 
     /// Expire the admission both through hidden logic and through the next input hook, then
     /// assert that cancellation left no gesture, zoom or edit behind.
-    fn assert_timed_out_gesture(h: &mut Harness<'static, crate::PdfCraftApp>, reply: &Receiver<Reply>, hidden_logic: bool, zoom: f32, bytes: &[u8]) {
+    fn assert_timed_out_gesture(h: &mut Harness<'static, crate::PDFKraftApp>, reply: &Receiver<Reply>, hidden_logic: bool, zoom: f32, bytes: &[u8]) {
         age_input(h.state_mut().control.as_mut().unwrap());
         if hidden_logic {
             let ctx = h.ctx.clone();
@@ -2804,7 +2804,7 @@ mod lifecycle_tests {
 
     /// Complete one public gesture and check its real event trace and one-step zoom.
     fn complete_positive_gesture(
-        h: &mut Harness<'static, crate::PdfCraftApp>,
+        h: &mut Harness<'static, crate::PDFKraftApp>,
         client: &ControlClient,
         gesture: Gesture,
         positive: Gesture,
@@ -3158,7 +3158,7 @@ mod pointer_tests {
         struct Probe {
             control: Option<Control>,
             client: Option<ControlClient>,
-            host: crate::PdfCraftApp,
+            host: crate::PDFKraftApp,
             primary: usize,
             secondary: usize,
             disabled: usize,
@@ -3182,12 +3182,12 @@ mod pointer_tests {
         let slow_dt = (max_duration + 0.25) as f32;
         assert!(f64::from(slow_dt) > max_duration);
         for discard in [false, true] {
-            // This probe draws its own UI with the harness's fonts, not PdfCraftApp::ui.
+            // This probe draws its own UI with the harness's fonts, not PDFKraftApp::ui.
             // Exercise the readiness gate explicitly before allowing this host's input.
             let state = Probe {
                 control: None,
                 client: None,
-                host: crate::PdfCraftApp::new(),
+                host: crate::PDFKraftApp::new(),
                 primary: 0,
                 secondary: 0,
                 disabled: 0,

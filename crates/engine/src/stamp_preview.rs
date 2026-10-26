@@ -2,8 +2,8 @@
 
 use std::sync::Arc;
 
-use pdfcraft_cos::{SaveOptions, write_incremental};
-use pdfcraft_render::{PageRenderer, RenderConfig, RenderPool, RenderRequest, RenderedPage};
+use pdfkraft_cos::{SaveOptions, write_incremental};
+use pdfkraft_render::{PageRenderer, RenderConfig, RenderPool, RenderRequest, RenderedPage};
 
 use crate::{Document, guard};
 
@@ -69,14 +69,14 @@ impl Document {
                 return Ok(None);
             }
             let mut stamp = editor.cos.clone();
-            if !pdfcraft_annot::isolate_annotation(&mut stamp, page, index).map_err(|e| e.to_string())? {
+            if !pdfkraft_annot::isolate_annotation(&mut stamp, page, index).map_err(|e| e.to_string())? {
                 return Ok(None);
             }
             let mut background = editor.cos.clone();
-            pdfcraft_annot::delete_annotation(&mut background, page, index).map_err(|e| e.to_string())?;
+            pdfkraft_annot::delete_annotation(&mut background, page, index).map_err(|e| e.to_string())?;
             // The page beneath as it is displayed: comments without an appearance get theirs.
-            let background = pdfcraft_annot::with_missing_appearances(&background).unwrap_or(background);
-            let write = |cos: &pdfcraft_cos::Document| write_incremental(cos, &SaveOptions::default()).map(Arc::new).map_err(|e| e.to_string());
+            let background = pdfkraft_annot::with_missing_appearances(&background).unwrap_or(background);
+            let write = |cos: &pdfkraft_cos::Document| write_incremental(cos, &SaveOptions::default()).map(Arc::new).map_err(|e| e.to_string());
             Ok(Some(StampPreview { page, background: write(&background)?, stamp: write(&stamp)?, config: self.config.clone() }))
         })?
     }

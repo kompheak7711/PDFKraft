@@ -4,8 +4,8 @@
 use std::collections::HashMap;
 
 use egui::{Color32, Pos2, Rect, Stroke};
-use pdfcraft_engine::{Document, Edit, EditableObject, MAX_MOVE_OBJECTS, ObjectKind, ObjectTarget};
-use pdfcraft_render::DocInfo;
+use pdfkraft_engine::{Document, Edit, EditableObject, MAX_MOVE_OBJECTS, ObjectKind, ObjectTarget};
+use pdfkraft_render::DocInfo;
 
 use crate::canvas::{DocView, PageXform};
 use crate::page_pointer::PagePointer;
@@ -403,7 +403,7 @@ pub(crate) fn nudge_keys(ctx: &egui::Context, view: &mut DocView, doc: &Document
         && let Some(r) = doc.page_images(page).get(index).map(|im| im.rect)
     {
         let rect = [r[0] + offset[0], r[1] + offset[1], r[2] + offset[0], r[3] + offset[1]];
-        view.pending_edit = Some(Edit::EditPageImage { page, index, change: pdfcraft_engine::ImageEdit::Move(rect) });
+        view.pending_edit = Some(Edit::EditPageImage { page, index, change: pdfkraft_engine::ImageEdit::Move(rect) });
     }
 }
 
@@ -434,8 +434,8 @@ fn delete_edit(page: usize, mut targets: Vec<ObjectTarget>) -> Option<Edit> {
     let mut edits: Vec<Edit> = targets
         .into_iter()
         .map(|t| match t.kind {
-            ObjectKind::Text => Edit::EditTextBlock { page, block: t.index, text: String::new(), style: pdfcraft_engine::BlockStyle::default() },
-            ObjectKind::Image => Edit::EditPageImage { page, index: t.index, change: pdfcraft_engine::ImageEdit::Delete },
+            ObjectKind::Text => Edit::EditTextBlock { page, block: t.index, text: String::new(), style: pdfkraft_engine::BlockStyle::default() },
+            ObjectKind::Image => Edit::EditPageImage { page, index: t.index, change: pdfkraft_engine::ImageEdit::Delete },
             ObjectKind::Added => Edit::DeleteContent { page, index: t.index },
         })
         .collect();
@@ -470,7 +470,7 @@ pub(crate) fn paint(painter: &egui::Painter, xf: &PageXform, page: usize, info: 
 }
 
 /// Keep the UI refusal actionable and translated; headless callers retain the detailed error.
-pub(crate) fn move_error(error: &pdfcraft_engine::EditError) -> String {
+pub(crate) fn move_error(error: &pdfkraft_engine::EditError) -> String {
     let detail = error.to_string();
     match detail.as_str() {
         "vertical text cannot be moved in a group" => tl!("Vertical text cannot be moved with this selection.").into(),
@@ -501,7 +501,7 @@ mod tests {
                     assert!(text.is_empty());
                     ('t', *block)
                 }
-                Edit::EditPageImage { index, change: pdfcraft_engine::ImageEdit::Delete, .. } => ('i', *index),
+                Edit::EditPageImage { index, change: pdfkraft_engine::ImageEdit::Delete, .. } => ('i', *index),
                 Edit::DeleteContent { index, .. } => ('a', *index),
                 other => panic!("unexpected {}", other.label().wording),
             })
