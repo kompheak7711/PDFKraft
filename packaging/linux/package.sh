@@ -46,7 +46,7 @@ case "$ARCH" in
   aarch64 | arm64) ARCH=aarch64; DEB_ARCH=arm64 ;;
   *) echo "unsupported architecture $ARCH" >&2; exit 2 ;;
 esac
-export PDFKRAFT_MAINTAINER="${PDFKRAFT_MAINTAINER:-PDFKraft maintainers <pdfkraft@storyteller.ai>}"
+export PDFKRAFT_MAINTAINER="${PDFKRAFT_MAINTAINER:-PDFKraft maintainers <kompheak7711@users.noreply.github.com>}"
 LABEL_SUFFIX="${PDFKRAFT_BUILD_LABEL:+-$PDFKRAFT_BUILD_LABEL}"
 BASENAME="pdfkraft-$VERSION$LABEL_SUFFIX-linux-$ARCH"
 

@@ -220,7 +220,6 @@
 	; failed: {list}	; eșuate: {list}
 	; {n} pages already had text	; {n} pagini aveau deja text
 	? of {n}	? din {n}
-	A clean-room, open-source PDF application written in Rust. MIT OR Apache-2.0.	O aplicație PDF open-source, clean-room, scrisă în Rust. MIT OR Apache-2.0.
 	Accessibility Checker	Verificator de accesibilitate
 	Accessibility Checker Options	Opțiuni verificator de accesibilitate
 	Acrobat 3.0 and later (40-bit RC4)	Acrobat 3.0 și ulterior (RC4 pe 40 de biți)
@@ -272,7 +271,6 @@
 	Also recognize pages that already have text	Recunoaște și paginile care au deja text
 	Alternate text	Text alternativ
 	An action with this name already exists.	Există deja o acțiune cu acest nume.
-	An open-source PDF workbench — local, private, and scriptable.	Un spațiu de lucru PDF open-source: local, privat și scriptabil.
 	Angle	Unghi
 	Animation effects	Efecte de animație
 	Annotations, form fill-in, and digital signatures	Adnotări, completarea formularelor și semnături digitale
@@ -612,7 +610,6 @@
 	From {file}	Din {file}
 	From:	De la:
 	Front side only	Doar față
-	Get help, share feedback and follow development on Discord.	Primiți ajutor, trimiteți păreri și urmăriți dezvoltarea pe Discord.
 	Go to a page view	Salt la o vizualizare de pagină
 	Go to page {p}	Salt la pagina {p}
 	Go to the page	Salt la pagină
@@ -664,8 +661,6 @@
 	JavaScript Console	Consolă JavaScript
 	JavaScript is turned off (Preferences ▸ JavaScript).	JavaScript este dezactivat (Preferințe > JavaScript).
 	JavaScript, e.g. getField("total").value	JavaScript, de ex. getField("total").value
-	Join our Discord	Intrați pe Discord-ul nostru
-	Join the ArtCraft community	Alăturați-vă comunității ArtCraft
 	Justify	Aliniere stânga-dreapta
 	Keep source fonts	Păstrare fonturi sursă
 	Keep tool selected	Instrumentul rămâne selectat
@@ -856,7 +851,6 @@
 	Pages:	Pagini:
 	Pages: {k} of {n}	Pagini: {k} din {n}
 	Paper:	Hârtie:
-	Part of	Parte din
 	Password	Parolă
 	Password required	Este necesară parola
 	Password security	Securitate prin parolă
@@ -1345,7 +1339,6 @@
 	Archive documents	Arhivare documente
 	Area	Arie
 	Arrow	Săgeată
-	ArtCraft website	Site-ul ArtCraft
 	Ask about this document	Întrebări despre acest document
 	Attach a file	Atașare fișier
 	Attach file	Atașare fișier
@@ -1484,7 +1477,6 @@
 	Insert text	Inserare text
 	JavaScript	JavaScript
 	JavaScript console…	Consolă JavaScript…
-	Join the ArtCraft Discord	Intrați pe Discord-ul ArtCraft
 	Light gray	Gri deschis
 	Line	Linie
 	Link	Link
@@ -1516,7 +1508,6 @@
 	Page transitions	Tranziții pagini
 	Paste pages	Lipire pagini
 	PDFKraft on GitHub	PDFKraft pe GitHub
-	PDFKraft web page	Pagina web PDFKraft
 	Perimeter	Perimetru
 	Pin folder to Home…	Fixare folder în Acasă…
 	PostScript / EPS	PostScript / EPS

@@ -219,7 +219,6 @@ theme	Appearance	Giao diện
 	; failed: {list}	; thất bại: {list}
 	; {n} pages already had text	; {n} trang đã có văn bản
 	? of {n}	? trên {n}
-	A clean-room, open-source PDF application written in Rust. MIT OR Apache-2.0.	Ứng dụng PDF mã nguồn mở, viết lại độc lập (clean-room) bằng Rust. MIT OR Apache-2.0.
 	Accessibility Checker	Trình kiểm tra trợ năng
 	Accessibility Checker Options	Tùy chọn trình kiểm tra trợ năng
 	Acrobat 3.0 and later (40-bit RC4)	Acrobat 3.0 trở lên (RC4 40 bit)
@@ -272,7 +271,6 @@ theme	Appearance	Giao diện
 	Also recognize pages that already have text	Nhận dạng cả các trang đã có văn bản
 	Alternate text	Văn bản thay thế
 	An action with this name already exists.	Đã có hành động với tên này.
-	An open-source PDF workbench — local, private, and scriptable.	Bộ công cụ PDF mã nguồn mở — chạy cục bộ, riêng tư và có thể viết kịch bản.
 	Angle	Góc
 	Animation effects	Hiệu ứng hoạt họa
 	Annotations, form fill-in, and digital signatures	Chú thích, điền biểu mẫu và chữ ký số
@@ -615,7 +613,6 @@ theme	Appearance	Giao diện
 	From {file}	Từ {file}
 	From:	Từ:
 	Front side only	Chỉ mặt trước
-	Get help, share feedback and follow development on Discord.	Nhận trợ giúp, chia sẻ phản hồi và theo dõi quá trình phát triển trên Discord.
 	Go to a page view	Đi tới một chế độ xem trang
 	Go to page {p}	Đi tới trang {p}
 	Go to the page	Đi tới trang
@@ -669,8 +666,6 @@ theme	Appearance	Giao diện
 	JavaScript Console	Bảng điều khiển JavaScript
 	JavaScript is turned off (Preferences ▸ JavaScript).	JavaScript đã bị tắt (Tùy chọn > JavaScript).
 	JavaScript, e.g. getField("total").value	JavaScript, ví dụ getField("total").value
-	Join our Discord	Tham gia Discord của chúng tôi
-	Join the ArtCraft community	Tham gia cộng đồng ArtCraft
 	Justify	Căn đều
 	Keep source fonts	Giữ phông chữ nguồn
 	Keep tool selected	Giữ công cụ được chọn
@@ -892,7 +887,6 @@ theme	Appearance	Giao diện
 	Pages:	Trang:
 	Pages: {k} of {n}	Trang: {k} trên {n}
 	Paper:	Giấy:
-	Part of	Một phần của
 	Password	Mật khẩu
 	Password required	Yêu cầu mật khẩu
 	Password security	Bảo mật bằng mật khẩu
@@ -1385,7 +1379,6 @@ theme	Appearance	Giao diện
 	Archive documents	Lưu trữ tài liệu
 	Area	Diện tích
 	Arrow	Mũi tên
-	ArtCraft website	Trang web ArtCraft
 	Ask about this document	Hỏi về tài liệu này
 	Attach a file	Đính kèm một tệp
 	Attach file	Đính kèm tệp
@@ -1524,7 +1517,6 @@ theme	Appearance	Giao diện
 	Insert text	Chèn văn bản
 	JavaScript	JavaScript
 	JavaScript console…	Bảng điều khiển JavaScript…
-	Join the ArtCraft Discord	Tham gia Discord của ArtCraft
 	Light gray	Xám nhạt
 	Line	Đường thẳng
 	Link	Liên kết
@@ -1556,7 +1548,6 @@ theme	Appearance	Giao diện
 	Page transitions	Hiệu ứng chuyển trang
 	Paste pages	Dán trang
 	PDFKraft on GitHub	PDFKraft trên GitHub
-	PDFKraft web page	Trang web PDFKraft
 	Perimeter	Chu vi
 	Pin folder to Home…	Ghim thư mục vào Trang chủ…
 	PostScript / EPS	PostScript / EPS

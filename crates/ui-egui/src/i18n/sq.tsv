@@ -47,7 +47,6 @@
 	? of {n}	? nga {n}
 	@{login}: {prs} PRs, {commits} commits, +{added} / −{deleted} lines (Δ {delta}), +{bin_added} / −{bin_deleted} binary assets, {first} – {last}	@{login}: {prs} PR, {commits} commit, +{added} / −{deleted} rreshta (Δ {delta}), +{bin_added} / −{bin_deleted} burime binare, {first} – {last}
 	A button	Një buton
-	A clean-room, open-source PDF application written in Rust. MIT OR Apache-2.0.	Një aplikacion PDF me kod të hapur, i zhvilluar në mënyrë clean-room dhe i shkruar në Rust. MIT OR Apache-2.0.
 	A diagonal CONFIDENTIAL watermark on every page.	Një watermark diagonal CONFIDENTIAL në çdo faqe.
 	A document needs at least one page: copy instead	Një dokument ka nevojë për të paktën një faqe: kopjoje në vend të kësaj
 	A form field has additional actions	Një fushë formulari ka veprime shtesë
@@ -202,7 +201,6 @@
 	An embedded file has no AFRelationship	Një skedar i ngulitur nuk ka AFRelationship
 	An image asks to be interpolated	Një imazh kërkon të interpolohet
 	An image has alternates or OPI information	Një imazh ka alternativa ose informacion OPI
-	An open-source PDF workbench — local, private, and scriptable.	Një hapësirë pune PDF me kod të hapur — lokale, private dhe e programueshme me skripte.
 	Angle	Këndi
 	Animation that flashes can cause seizures. Check scripts and media for flicker.	Animacioni që xixëllon mund të shkaktojë kriza. Kontrolloni skriptet dhe median për dridhje.
 	Annotations, form fill-in, and digital signatures	Shënime, plotësim formularësh dhe nënshkrime dixhitale
@@ -229,7 +227,6 @@
 	Archive documents	Arkivo dokumentet
 	Area	Sipërfaqja
 	Arrow	Shigjetë
-	ArtCraft website	Faqja e internetit e ArtCraft
 	Ask about this document	Pyet për këtë dokument
 	Asks GitHub for the latest release. Nothing is downloaded or installed automatically.	I kërkon GitHub-it versionin më të fundit. Asgjë nuk shkarkohet ose instalohet automatikisht.
 	Associated with content	E lidhur me përmbajtjen
@@ -871,7 +868,6 @@
 	Full screen mode	Modaliteti me ekran të plotë
 	General	Të përgjithshme
 	Geospatial location	Vendndodhja gjeohapësinore
-	Get help, share feedback and follow development on Discord.	Merr ndihmë, ndaj komente dhe ndiq zhvillimin në Discord.
 	Go to a page view	Shko te një pamje faqeje
 	Go to page {p}	Shko te faqja {p}
 	Go to page…	Shko te faqja…
@@ -977,9 +973,6 @@
 	JavaScript console…	Konsola JavaScript…
 	JavaScript is turned off (Preferences ▸ JavaScript).	JavaScript është çaktivizuar (Preferencat > JavaScript).
 	JavaScript, e.g. getField("total").value	JavaScript, p.sh. getField("total").value
-	Join our Discord	Bashkohu me Discord-in tonë
-	Join the ArtCraft Discord	Bashkohu me Discord-in e ArtCraft
-	Join the ArtCraft community	Bashkohu me komunitetin e ArtCraft
 	July	Korrik
 	June	Qershor
 	Justify	Drejto në të dyja anët
@@ -1297,7 +1290,6 @@
 	Pages with links, comments or fields should tab in structure order. The fix sets each page's tab order to Use Document Structure.	Faqet me lidhje, komente ose fusha duhet të kalojnë me tab sipas radhës së strukturës. Rregullimi vendos radhën e tab-it të çdo faqeje te Përdor strukturën e dokumentit.
 	Pages:	Faqet:
 	Paper:	Letra:
-	Part of	Pjesë e
 	Passed	Kaloi
 	Password	Fjalëkalimi
 	Password protection will be applied when you save	Mbrojtja me fjalëkalim do të zbatohet kur të ruash
@@ -1312,7 +1304,6 @@
 	Patterns (graphics objects)	Modelet (objekte grafike)
 	PDFKraft didn't shut down normally. These documents had changes that were autosaved:	PDFKraft nuk u mbyll normalisht. Këta dokumente kishin ndryshime të ruajtura automatikisht:
 	PDFKraft on GitHub	PDFKraft në GitHub
-	PDFKraft web page	Faqja ueb e PDFKraft
 	PDFKraft works offline. No telemetry, no account, and no cloud processing unless you add a provider.	PDFKraft funksionon pa internet. Pa telemetri, pa llogari dhe pa përpunim në re, përveçse nëse shton një ofrues.
 	PDFKraft {c} is up to date.	PDFKraft {c} është i përditësuar.
 	PDFKraft {v} is available.	PDFKraft {v} është i disponueshëm.

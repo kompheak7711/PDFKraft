@@ -37,9 +37,9 @@ pub const ALLOWED_LICENCES: &[&str] = &[
 ];
 
 /// The closed list of Adobe-authored, non-visual technical data (AGENTS.md §1.1): (crate, path).
-/// Storyteller's own brand marks (the ArtCraft name and logos): shipped in the app and docs, but
-/// not licensed for reuse by forks. Allowed only for `kind = "logo"` entries under `docs/brand/`
-/// (AGENTS.md §1.2).
+/// Upstream's trademarked brand marks, which forks must remove and which PDFKraft therefore does
+/// not carry (AGENTS.md §1.2). The identifier stays recognised so that such an entry can only ever
+/// be a `kind = "logo"` under `docs/brand/`, and that directory does not exist here.
 pub const BRAND_LICENCE: &str = "LicenseRef-Storyteller-Trademark";
 
 pub const ADOBE_DATA_ALLOWED: &[(&str, &str)] = &[("hayro-cmap", "assets/cmaps.brotli"), ("hayro-interpret", "src/font/generated/metrics.rs")];
@@ -617,8 +617,8 @@ mod tests {
     fn brand_licence_only_for_brand_logos() {
         let root = super::root();
         for (path, kind, pass) in [
-            ("docs/brand/artcraft-mark.svg", "logo", true),
-            ("docs/brand/artcraft-mark.svg", "icon", false),
+            ("docs/brand/upstream-mark.svg", "logo", true),
+            ("docs/brand/upstream-mark.svg", "icon", false),
             ("assets/icons/mark.svg", "logo", false),
         ] {
             let mut a = asset(path, "Storyteller", kind, BRAND_LICENCE);

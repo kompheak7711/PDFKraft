@@ -80,7 +80,7 @@ pdfkraft-cli run    --script steps.json [--root DIR] [--report]
     "\
 pdfkraft-cli ui     --control FILE <method> [key=value …] [--out shot.png]
                                                            drive a running app started with --control FILE
-help and feedback: https://discord.gg/artcraft"
+help and feedback: https://github.com/kompheak7711/PDFKraft/issues"
 );
 
 fn main() -> ExitCode {

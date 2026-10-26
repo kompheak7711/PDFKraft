@@ -102,7 +102,6 @@
 	Flatten Fill & Sign when saving	ادغام کردن پر کردن و امضا هنگام ذخیره
 	Text, marks and signatures become part of the page. Other comments stay editable.	متن، نشانه‌ها و امضا‌ها بخشی از صفحه می‌شوند. سایر یادداشت‌ها قابل‌ویرایش می‌مانند.
 	OK	تأیید
-	Join our Discord	به دیسکورد ما بپیوندید
 	Close	بستن
 	Next / previous match	تطابق بعدی / قبلی
 	Copy selected text	رونوشت متن انتخاب‌شده
@@ -172,9 +171,6 @@
 	Current page — type a page number or label (such as iv) and press Enter	صفحه فعلی — یک شماره یا برچسب صفحه (مانند iv) وارد کنید و Enter را فشار دهید
 	Zoom — type a percentage and press Enter	بزرگنمایی — یک درصد وارد کنید و Enter را فشار دهید
 	Welcome to PDFKraft	به PDFKraft خوش آمدید
-	An open-source PDF workbench — local, private, and scriptable.	یک میزکار PDF متن باز — محلی، خصوصی و قابل اسکریپت‌نویسی.
-	Join the ArtCraft community	به جامعه ArtCraft بپیوندید
-	Get help, share feedback and follow development on Discord.	کمک بگیرید، بازخورد بدهید و توسعه را در دیسکورد دنبال کنید.
 	Recommended tools	ابزار‌های پیشنهادی
 	Use now	همین حالا استفاده کنید
 	Open file	باز کردن فایل
@@ -319,10 +315,7 @@
 	Split document…	تقسیم سند…
 	Number pages…	شماره‌گذاری صفحه‌ها…
 	Keyboard shortcuts	میانبر‌های صفحه کلید
-	Join the ArtCraft Discord	به دیسکورد ArtCraft بپیوندید
-	PDFKraft web page	صفحه وب PDFKraft
 	PDFKraft on GitHub	PDFKraft در GitHub
-	ArtCraft website	وبسایت ArtCraft
 	Check for updates…	بررسی به‌روز‌رسانی‌ها…
 	About PDFKraft	درباره PDFKraft
 	Export a PDF	برونبرد یک PDF
@@ -1453,8 +1446,6 @@
 	Recover	باز‌یابی
 	Discard	دور انداختن
 	Version {v}	نگارش {v}
-	A clean-room, open-source PDF application written in Rust. MIT OR Apache-2.0.	یک برنامه PDF متن باز و clean-room نوشته‌شده با Rust. MIT OR Apache-2.0.
-	Part of	بخشی از
 	Summarize Options	گزینه‌های خلاصه‌سازی
 	Choose a layout:	یک چیدمان انتخاب کنید:
 	Comments only	فقط یادداشت‌ها

@@ -1346,10 +1346,7 @@ fn dialogs(app: &mut PDFKraftApp, ctx: &egui::Context) {
                             .small(),
                         );
                         ui.add_space(12.0);
-                        ui.label(
-                            egui::RichText::new(tl!("Based on PdfCraft (MIT OR Apache-2.0), with its ArtCraft branding removed."))
-                                .color(t.text_muted),
-                        );
+                        ui.label(egui::RichText::new(tl!("Based on PdfCraft (MIT OR Apache-2.0).")).color(t.text_muted));
                         ui.add_space(6.0);
                         if let Some(cmd) = widgets::community_links(ui) {
                             link_command = Some(cmd);

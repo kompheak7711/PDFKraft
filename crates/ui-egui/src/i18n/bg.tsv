@@ -1400,8 +1400,6 @@
 	Delete selected pages (Organize)	Изтрий избраните страници (Организиране)
 	Select all pages (Organize)	Избери всички страници (Организиране)
 	Version {v}	Версия {v}
-	A clean-room, open-source PDF application written in Rust. MIT OR Apache-2.0.	Независимо разработено PDF приложение с отворен код, написано на Rust. MIT OR Apache-2.0.
-	Part of	Част от
 	Summarize Options	Опции за обобщение
 	Choose a layout:	Изберете оформление:
 	Comments only	Само коментари
@@ -1847,7 +1845,6 @@
 	Convert	Конвертиране
 	E-Sign	Е-подпис
 	Welcome to PDFKraft	Добре дошли в PDFKraft
-	An open-source PDF workbench — local, private, and scriptable.	PDF работна среда с отворен код — локална, поверителна и програмируема.
 	Recommended tools	Препоръчани инструменти
 	Use now	Използвай сега
 	Recent	Последни
@@ -1881,13 +1878,7 @@
 	Split document…	Раздели документа…
 	Number pages…	Номерирай страниците…
 	Keyboard shortcuts	Клавишни комбинации
-	Join the ArtCraft Discord	Присъедини се към ArtCraft в Discord
-	Join the ArtCraft community	Присъедини се към общността на ArtCraft
-	Get help, share feedback and follow development on Discord.	Получете помощ, споделете мнение и следете разработката в Discord.
-	Join our Discord	Присъедини се към нашия Discord
-	PDFKraft web page	Уебстраница на PDFKraft
 	PDFKraft on GitHub	PDFKraft в GitHub
-	ArtCraft website	Уебсайт на ArtCraft
 	Check for updates…	Провери за актуализации…
 	About PDFKraft	За PDFKraft
 	JavaScript console…	JavaScript конзола…

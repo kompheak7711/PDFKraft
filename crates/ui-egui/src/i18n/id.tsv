@@ -212,7 +212,6 @@
 	; failed: {list}	; gagal: {list}
 	; {n} pages already had text	; {n} halaman sudah memiliki teks
 	? of {n}	? dari {n}
-	A clean-room, open-source PDF application written in Rust. MIT OR Apache-2.0.	Aplikasi PDF clean-room sumber terbuka yang ditulis dengan Rust. MIT OR Apache-2.0.
 	Accessibility Checker	Pemeriksa Aksesibilitas
 	Accessibility Checker Options	Opsi Pemeriksa Aksesibilitas
 	Acrobat 3.0 and later (40-bit RC4)	Acrobat 3.0 dan yang lebih baru (40-bit RC4)
@@ -264,7 +263,6 @@
 	Also recognize pages that already have text	Kenali juga halaman yang sudah memiliki teks
 	Alternate text	Teks alternatif
 	An action with this name already exists.	Tindakan dengan nama ini sudah ada.
-	An open-source PDF workbench — local, private, and scriptable.	Meja kerja PDF sumber terbuka — lokal, privat, dan dapat diotomatisasi dengan skrip.
 	Angle	Sudut
 	Animation effects	Efek animasi
 	Annotations, form fill-in, and digital signatures	Anotasi, pengisian formulir, dan tanda tangan digital
@@ -603,7 +601,6 @@
 	From {file}	Dari {file}
 	From:	Dari:
 	Front side only	Hanya sisi depan
-	Get help, share feedback and follow development on Discord.	Dapatkan bantuan, berikan masukan, dan ikuti pengembangan di Discord.
 	Go to a page view	Ke tampilan halaman
 	Go to page {p}	Ke halaman {p}
 	Go to the page	Ke halaman tersebut
@@ -655,8 +652,6 @@
 	JavaScript Console	Konsol JavaScript
 	JavaScript is turned off (Preferences ▸ JavaScript).	JavaScript dimatikan (Preferensi > JavaScript).
 	JavaScript, e.g. getField("total").value	JavaScript, misalnya getField("total").value
-	Join our Discord	Gabung ke Discord kami
-	Join the ArtCraft community	Gabung ke komunitas ArtCraft
 	Justify	Ratakan kanan-kiri
 	Keep source fonts	Pertahankan font sumber
 	Keep tool selected	Pertahankan alat terpilih
@@ -847,7 +842,6 @@
 	Pages:	Halaman:
 	Pages: {k} of {n}	Halaman: {k} dari {n}
 	Paper:	Kertas:
-	Part of	Bagian dari
 	Password	Kata sandi
 	Password required	Kata sandi diperlukan
 	Password security	Keamanan kata sandi
@@ -1336,7 +1330,6 @@
 	Archive documents	Arsipkan dokumen
 	Area	Luas
 	Arrow	Panah
-	ArtCraft website	Situs ArtCraft
 	Ask about this document	Tanyakan tentang dokumen ini
 	Attach a file	Lampirkan file
 	Attach file	Lampirkan file
@@ -1475,7 +1468,6 @@
 	Insert text	Sisipkan teks
 	JavaScript	JavaScript
 	JavaScript console…	Konsol JavaScript…
-	Join the ArtCraft Discord	Gabung ke Discord ArtCraft
 	Light gray	Abu-abu muda
 	Line	Garis
 	Link	Tautan
@@ -1507,7 +1499,6 @@
 	Page transitions	Transisi halaman
 	Paste pages	Tempel halaman
 	PDFKraft on GitHub	PDFKraft di GitHub
-	PDFKraft web page	Halaman web PDFKraft
 	Perimeter	Keliling
 	Pin folder to Home…	Sematkan folder ke Beranda…
 	PostScript / EPS	PostScript / EPS

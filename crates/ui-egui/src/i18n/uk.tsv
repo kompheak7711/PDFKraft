@@ -94,7 +94,6 @@
 	Side panels	Бічні панелі
 	Enable Acrobat JavaScript	Увімкнути Acrobat JavaScript
 	OK	OK
-	Join our Discord	Приєднатися до нашого Discord
 	Close	Закрити
 	Next / previous match	Наступний / попередній збіг
 	Copy selected text	Копіювати виділений текст
@@ -164,9 +163,6 @@
 	Current page — type a page number or label (such as iv) and press Enter	Поточна сторінка — введіть номер або позначку сторінки (наприклад iv) і натисніть Enter
 	Zoom — type a percentage and press Enter	Масштаб — введіть відсоток і натисніть Enter
 	Welcome to PDFKraft	Вітаємо в PDFKraft
-	An open-source PDF workbench — local, private, and scriptable.	Відкритий інструментарій для PDF — локальний, приватний і з підтримкою сценаріїв.
-	Join the ArtCraft community	Приєднатися до спільноти ArtCraft
-	Get help, share feedback and follow development on Discord.	Отримуйте допомогу, діліться відгуками й стежте за розробкою в Discord.
 	Recommended tools	Рекомендовані інструменти
 	Use now	Використати зараз
 	Open file	Відкрити файл
@@ -320,10 +316,7 @@
 	Split document…	Розділити документ…
 	Number pages…	Пронумерувати сторінки…
 	Keyboard shortcuts	Клавіатурні скорочення
-	Join the ArtCraft Discord	Приєднатися до Discord ArtCraft
-	PDFKraft web page	Вебсторінка PDFKraft
 	PDFKraft on GitHub	PDFKraft на GitHub
-	ArtCraft website	Вебсайт ArtCraft
 	Check for updates…	Перевірити оновлення…
 	About PDFKraft	Про PDFKraft
 	Export a PDF	Експортувати PDF
@@ -1455,8 +1448,6 @@
 	Recover	Відновити
 	Discard	Відкинути
 	Version {v}	Версія {v}
-	A clean-room, open-source PDF application written in Rust. MIT OR Apache-2.0.	Відкритий застосунок для PDF, написаний на Rust за принципом незалежної розробки. MIT OR Apache-2.0.
-	Part of	Частина
 	Summarize Options	Параметри зведення
 	Choose a layout:	Виберіть макет:
 	Comments only	Лише коментарі
