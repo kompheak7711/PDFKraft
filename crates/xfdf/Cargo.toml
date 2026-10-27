@@ -13,5 +13,5 @@ pdfkraft-cos = { workspace = true }
 pdfkraft-annot = { workspace = true }
 pdfkraft-forms = { workspace = true }
 pdfkraft-model = { workspace = true }
-roxmltree = "0.20"
+roxmltree = "0.21"
 thiserror = { workspace = true }
